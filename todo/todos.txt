@@ -1,0 +1,4 @@
+Session title	Areas	Priority	Charter
+sample session title1	area1	1	This is the free-form text of charter1 I want you to do for the areas below
+sample session title2	area1;area2	2	This is the free-form text of charter2 I want you to do for the areas below
+sample session title3	area1;area2;area3	3	This is the free-form text of charter3 I want you to do for the areas below
