@@ -55,7 +55,8 @@ Some suggestions:
   a) Indicate why you are testing something, what you are looking for, what prompted you to look there
   b) Indicate any references (specs, docs, manuals, etc.) used, or people (e.g. SME) you spoke with
   c) What you did to test this area (test design, tools, techniques, particular setup or data)
-  d) Describe observations - the result(s) of the test(s). Do you need screen captures, log files, something other, to include with these notes? if so, indicate here where you are storing these files.
+  d) Describe observations - the result(s) of the test(s). Do you need screen captures, log files,
+     something other, to include with these notes? if so, indicate here where you are storing these files.
   e) Summary - assess whether the test(s) passed or failed your expectations (i.e. identify Oracles)
 >
 
