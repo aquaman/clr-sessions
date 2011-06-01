@@ -15,7 +15,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 30 May 2011
+# Last Updated:: 31 May 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0).upcase
@@ -98,7 +98,7 @@ def make_coverage( title, sortby )
       # edit the line and insert the actual 'Normal' value from the config file
       line['90'] = @timebox['normal'].to_s
       @f_COVER.puts line
-          elsif ( line =~ /^table header goes here/)
+    elsif ( line =~ /^table header goes here/)
       # print only the column headings we need
       @f_COVER.puts '    <td width="6%"><b><font face="Arial"><a href="c_by_total.htm">TOTAL</a></font></b></td>' if @include_switch['Duration']
       @f_COVER.puts '    <td width="6%"><b><font face="Arial"><a href="c_by_chtr.htm">CHTR</a></font></b></td>' if @include_switch['C vs O']
@@ -174,16 +174,16 @@ def make_session( title, sortby )
   @f_TSES.rewind
   @f_SES = File.new(@reportdir + "/#{title}", 'w') rescue die( "Can't open #{@reportdir}\\#{title}", __LINE__ )
   
-        while ( line = @f_TSES.gets )
-          if ( line =~ /^table data goes here/)
-            get_session_line
-          elsif ( line =~ /^Report current.*/)
-            @f_SES.puts "Report current as of: #{@thedate}"
+  while ( line = @f_TSES.gets )
+    if ( line =~ /^table data goes here/)
+      get_session_line
+    elsif ( line =~ /^Report current.*/)
+      @f_SES.puts "Report current as of: #{@thedate}"
     elsif ( line =~ /about 90 minutes/ )
       # edit the line and insert the actual 'Normal' value from the config file
       line['90'] = @timebox['normal'].to_s
       @f_SES.puts line
-          elsif ( line =~ /^table header goes here/)
+    elsif ( line =~ /^table header goes here/)
       # print only the column headings we need
       @f_SES.puts '    <th><font face="Arial"><a href="s_by_dur.htm">DUR</a></font></th>' if @include_switch['Duration']
       @f_SES.puts '    <th><font face="Arial"><a href="s_by_chtr.htm">CHTR</a></font></th>' if @include_switch['C vs O']
@@ -191,12 +191,12 @@ def make_session( title, sortby )
       @f_SES.puts '    <th><font face="Arial"><a href="s_by_test.htm">TEST</a></font></th>' if @include_switch['TBS']
       @f_SES.puts '    <th><font face="Arial"><a href="s_by_bug.htm">BUG</a></font></th>' if @include_switch['TBS']
       @f_SES.puts '    <th><font face="Arial"><a href="s_by_setup.htm">SETUP</a></font></th>' if @include_switch['TBS']
-          else
-            @f_SES.puts line
-          end
-        end
-  
-        @f_SES.close
+    else
+      @f_SES.puts line
+    end
+  end
+
+  @f_SES.close
 end
 
 ##
@@ -344,7 +344,7 @@ make_session('s_by_testers.htm', 11)
 
 if @include_switch['Areas']
   f_DATA = File.open(metricsdir + '/breakdowns-coverage-total.txt') rescue die( "Can't open #{metricsdir}\\breakdowns-coverage-total.txt", __LINE__ )
-  
+
   f_DATA.gets     # (skip the first header line)
   @fields = []
   while ( line = f_DATA.gets )

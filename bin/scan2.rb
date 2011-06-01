@@ -18,7 +18,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 30 May 2011
+# Last Updated:: 31 May 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0).upcase
@@ -150,6 +150,7 @@ def clear_final_blanks( working_array )
       working_array.pop if working_array.last.strip.empty?
     end
     working_array.last.chomp!
+    
     return working_array
   end
 end
@@ -268,6 +269,7 @@ def parse_tester
     end
   end
   error("Missing tester name in TESTER section") if testers_found.empty?
+  
   return testers_found
 end
 
@@ -518,7 +520,7 @@ def parse_breakdown( num_testers )
         
         (dur_val, dur_times) = line.split('*')
         dur_val.strip!
-	dur_val.downcase!
+        dur_val.downcase!
         
         if ( dur_times.nil? ) or ( dur_times.strip.empty? )
           dur_times = '1'
@@ -1332,6 +1334,7 @@ testers.each do | tester_name, sess_arr |
     tbugs[ tester_name ].to_s + "\"\t\"" + 
     tissues[ tester_name ].to_s + '"'
   
+  # (Switch the date format back to 'mm/dd/yy' here)
   dn_total.sort.each do | date_name, value |
     start = date_name.split(/\t/)[0]
     f_TDAYBREAKS.puts '"' + tester_name + "\"\t\"" + 

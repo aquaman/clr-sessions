@@ -7,6 +7,6 @@
 DEL sheets.txt
 
 : # Search the specified folder and save the output in the current folder
-bin\search.rb approved .
+bin\search.rb approved
 
 START sheets.txt
