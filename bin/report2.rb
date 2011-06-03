@@ -15,14 +15,14 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 31 May 2011
+# Last Updated:: 03 June 2011
 # Version:: 2.0
 # -----
-@ScriptName = File.basename($0).upcase
+@ScriptName = File.basename($0)
 
 if ARGV[0].nil? or ! File.exist?( ARGV[0] + '/sbtm.yml' )
-  puts "\nUsage: #{@ScriptName} CONFIG_DIR"
-  puts "\nWhere CONFIG_DIR is the path to the directory containing SBTM.YML\n"
+  puts "\nUsage: #{@ScriptName} config_dir"
+  puts "\nWhere: 'config_dir' is the path to the directory containing SBTM.YML\n"
   exit
 end
 
@@ -34,12 +34,14 @@ require 'Time' unless Time.methods.include? 'parse'
 config = YAML.load_file( ARGV[0] + '/sbtm.yml' )
 
 begin
-  templatedir = config['folders']['report_templates']
-  metricsdir = config['folders']['metrics_dir']
-  @reportdir = config['folders']['report_dir']
+  template_dir = config['folders']['report_templates']
+  metrics_dir = config['folders']['metrics_dir']
+  @report_dir = config['folders']['report_dir']
   
   @timebox = config['timebox']
   @include_switch = config['scan_options']
+  
+  raise if template_dir.nil? or metrics_dir.nil? or @report_dir.nil? or @timebox.nil? or @include_switch.nil?
 rescue
   puts '*'*50
   puts 'Error reading value from SBTM.YML!'
@@ -48,7 +50,7 @@ rescue
 end
 
 # CHECK that the file directories specified appear to be valid:
-[ templatedir, metricsdir, @reportdir ].each do |folder|
+[ template_dir, metrics_dir, @report_dir ].each do |folder|
   unless FileTest.directory?( folder )
     puts '*'*50
     puts "'" + folder + "' is not a valid directory!" 
@@ -87,7 +89,7 @@ def make_coverage( title, sortby )
   end
   
   @f_TCOVER.rewind
-  @f_COVER = File.new(@reportdir + "/#{title}", 'w') rescue die( "Can't open #{@reportdir}\\#{title}", __LINE__ )
+  @f_COVER = File.new(@report_dir + "/#{title}", 'w') rescue die( "Can't open #{@report_dir}\\#{title}", __LINE__ )
 
   while ( line = @f_TCOVER.gets )
     if ( line =~ /^table data goes here/ )
@@ -172,7 +174,7 @@ def make_session( title, sortby )
   end
   
   @f_TSES.rewind
-  @f_SES = File.new(@reportdir + "/#{title}", 'w') rescue die( "Can't open #{@reportdir}\\#{title}", __LINE__ )
+  @f_SES = File.new(@report_dir + "/#{title}", 'w') rescue die( "Can't open #{@report_dir}\\#{title}", __LINE__ )
   
   while ( line = @f_TSES.gets )
     if ( line =~ /^table data goes here/)
@@ -266,9 +268,9 @@ end
 
 ### START ###
 
-f_TSTATUS = File.open(templatedir + '/status.tpl') rescue die( "Can't open #{templatedir}\\status.tpl", __LINE__ )
-f_STATUS = File.new(@reportdir + '/status.htm', 'w') rescue die( "Can't open #{@reportdir}\\status.htm", __LINE__ )
-f_BREAKS = File.open(metricsdir + '/breakdowns.txt') rescue die( "Can't open #{metricsdir}\\breakdowns.txt", __LINE__ )
+f_TSTATUS = File.open(template_dir + '/status.tpl') rescue die( "Can't open #{template_dir}\\status.tpl", __LINE__ )
+f_STATUS = File.new(@report_dir + '/status.htm', 'w') rescue die( "Can't open #{@report_dir}\\status.htm", __LINE__ )
+f_BREAKS = File.open(metrics_dir + '/breakdowns.txt') rescue die( "Can't open #{metrics_dir}\\breakdowns.txt", __LINE__ )
 
 ##
 # Create the main "Session Summary" page
@@ -322,7 +324,7 @@ f_TSTATUS.close
   6.times { values.delete_at(3) }     # (remove the columns we don't need)
 end
 
-@f_TSES = File.open(templatedir + '/sessions.tpl') rescue die( "Can't open #{templatedir}\\sessions.tpl", __LINE__ )
+@f_TSES = File.open(template_dir + '/sessions.tpl') rescue die( "Can't open #{template_dir}\\sessions.tpl", __LINE__ )
 
 make_session('s_by_ses.htm', 0)
 make_session('s_by_datetime.htm', 1)
@@ -343,7 +345,7 @@ make_session('s_by_testers.htm', 11)
 # Create the "Test Coverage Totals" pages (with column heading resorting) - only if the #Areas section is included
 
 if @include_switch['Areas']
-  f_DATA = File.open(metricsdir + '/breakdowns-coverage-total.txt') rescue die( "Can't open #{metricsdir}\\breakdowns-coverage-total.txt", __LINE__ )
+  f_DATA = File.open(metrics_dir + '/breakdowns-coverage-total.txt') rescue die( "Can't open #{metrics_dir}\\breakdowns-coverage-total.txt", __LINE__ )
 
   f_DATA.gets     # (skip the first header line)
   @fields = []
@@ -353,7 +355,7 @@ if @include_switch['Areas']
   end
   f_DATA.close
 
-  @f_TCOVER = File.open(templatedir + '/coverage.tpl') rescue die( "Can't open #{templatedir}\\coverage.tpl", __LINE__ )
+  @f_TCOVER = File.open(template_dir + '/coverage.tpl') rescue die( "Can't open #{template_dir}\\coverage.tpl", __LINE__ )
 
   make_coverage('c_by_total.htm', 0) if @include_switch['Duration']
   make_coverage('c_by_chtr.htm', 1) if @include_switch['C vs O']

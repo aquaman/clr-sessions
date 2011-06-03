@@ -18,17 +18,17 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 31 May 2011
+# Last Updated:: 03 June 2011
 # Version:: 2.0
 # -----
-@ScriptName = File.basename($0).upcase
+@ScriptName = File.basename($0)
 
-if ( ARGV.length < 2 ) or ! File.exist?( ARGV[0] + '/sbtm.yml' )
+if ( ARGV.length < 2 ) or ! File.exist?( ARGV[0] + '/sbtm.yml' ) or ! FileTest.directory?( ARGV[1] )
   puts "\n!! Invalid or incorrect number of command line arguments specified."
-  puts "\nUsage: #{@ScriptName} [CONFIG_DIR] [FOLDER_TO_SCAN]"
+  puts "\nUsage: #{@ScriptName} config_dir folder_to_scan"
   puts "\nWhere:"
-  puts "* CONFIG_DIR     = the path to the directory containing SBTM.YML"
-  puts "* FOLDER_TO_SCAN = the path to the directory containing the session sheets\n"
+  puts "* config_dir     = the path to the directory containing SBTM.YML"
+  puts "* folder_to_scan = the path to the directory containing the session sheets\n"
   exit
 end
 
@@ -37,19 +37,20 @@ require 'yaml'
 require 'Time' unless Time.methods.include? 'parse'
 
 # Read the Configuration file:
-config = YAML.load_file( ARGV[0] + '/sbtm.yml' )
+config_dir = ARGV[0]
+scan_dir = ARGV[1]
+config = YAML.load_file( config_dir + '/sbtm.yml' )
 
 begin
-  scandir = ARGV[1]
-  @filedir = config['folders']['data_dir']
-  configdir = config['folders']['config_dir']
-  metricsdir = config['folders']['metrics_dir']
+  @data_dir = config['folders']['data_dir']
+  metrics_dir = config['folders']['metrics_dir']
   
   logfile = config['output']['logfile']
   
   @timebox = config['timebox']
-  
   @include_switch = config['scan_options']
+  
+  raise if @data_dir.nil? or metrics_dir.nil? or @timebox.nil? or @include_switch.nil?
 rescue
   puts '*'*50
   puts 'Error reading value from SBTM.YML!'
@@ -58,24 +59,28 @@ rescue
 end
 
 # CHECK that the file directories specified appear to be valid:
-[ scandir, @filedir, metricsdir ].each do |folder|
+[ @data_dir, metrics_dir ].each do |folder|
   unless FileTest.directory?( folder )
     puts '*'*50
     puts "'" + folder + "' is not a valid directory!" 
-    puts "Please check the name specified and try again."
+    puts "Please check the name specified in SBTM.YML and try again."
     puts '*'*50
     exit
   end
 end
 
 # CHECK for the Log file argument and check for valid filename chars if given
-logfile = '' if logfile =~ /^\./    # Don't start a filename with a dot!
-logfile.gsub!( /[?:*"<>|]/, '')   # Remove some unwanted filename characters just in case they show up.
-if logfile.empty?
-  puts '!! Invalid filename specified for the LOG FILE.  Outputting to console...'
+if logfile.nil?
   @outfile = NIL
 else
-  @outfile = File.new( logfile, 'w' )
+  logfile = '' if logfile =~ /^\./    # Don't start a filename with a dot!
+  logfile.gsub!( /[?:*"<>|]/, '')   # Remove some unwanted filename characters just in case they show up.
+  if logfile.empty?
+    puts '!! Invalid filename specified for the logfile in SBTM.YML.  Outputting to console...'
+    @outfile = NIL
+  else
+    @outfile = File.new( logfile, 'w' )
+  end
 end
 
 # Set the TASK BREAKDOWN switch if one of the sub-sections are included:
@@ -680,11 +685,11 @@ def parse_data
     
   elsif ( ! na and content )
     @data_contents.each do |line|
-      file_exists = File.exist?( @filedir + '/' + line ) if ( line =~ /\w+/ )
+      file_exists = File.exist?( @data_dir + '/' + line ) if ( line =~ /\w+/ )
       if ( file_exists )
         @f_DATA.puts '"' + File.basename(@file) + "\"\t\"#{line}\""
       else
-        error("Missing data file \"#{line}\" in the data file directory. Ensure the file exists in the \"#{@filedir}\" directory specified as the second argument on the #{@ScriptName} command line.")
+        error("Missing data file \"#{line}\" in the data file directory. Ensure the file exists in the \"#{@data_dir}\" directory specified in the SBTM.YML configuration file.")
       end
     end
   end
@@ -906,7 +911,7 @@ end
 
 # Read in config files - if required:
 if @include_switch['Areas']
-  f_CFG = File.open( configdir + '/coverage.ini' ) rescue die( "Can't open #{configdir}\\coverage.ini", __LINE__ )
+  f_CFG = File.open( config_dir + '/coverage.ini' ) rescue die( "Can't open #{config_dir}\\coverage.ini", __LINE__ )
   @areas_list = []
   f_CFG.each do |line|
     @areas_list << line.strip.upcase unless ( line.strip.empty? or line =~ /^#/ )
@@ -915,7 +920,7 @@ if @include_switch['Areas']
 end
 
 if @include_switch['LTTD']
-  f_LTTD_INI = File.open( configdir + '/LTTD_Areas.ini' ) rescue die( "Can't open #{configdir}\\LTTD_Areas.ini", __LINE__ )
+  f_LTTD_INI = File.open( config_dir + '/LTTD_Areas.ini' ) rescue die( "Can't open #{config_dir}\\LTTD_Areas.ini", __LINE__ )
   @LTTD_Areas = []
   f_LTTD_INI.each do |line|
     @LTTD_Areas << line.strip.upcase unless ( line.strip.empty? or line =~ /^#/ )
@@ -924,7 +929,7 @@ if @include_switch['LTTD']
 end
 
 # Get the file lists :
-@sheets = Dir[ scandir + '/*.ses' ]
+@sheets = Dir[ scan_dir + '/*.ses' ]
 @sheets.map! {|x| x.downcase }
 
 todo = []
@@ -935,24 +940,24 @@ todo = []
 
 # Open files we will use to capture session data:
 
-@f_CHARTERS = File.new( metricsdir + '/charters.txt', 'w' )
+@f_CHARTERS = File.new( metrics_dir + '/charters.txt', 'w' )
 @f_CHARTERS.puts "\"Session\"\t\"Field\"\t\"Value\""
 
-@f_TESTERS = File.new( metricsdir + '/testers.txt', 'w' )
+@f_TESTERS = File.new( metrics_dir + '/testers.txt', 'w' )
 @f_TESTERS.puts "\"Session\"\t\"Tester\""
 
 if @include_switch['Data Files']
-  @f_DATA = File.new( metricsdir + '/data.txt', 'w' )
+  @f_DATA = File.new( metrics_dir + '/data.txt', 'w' )
   @f_DATA.puts "\"Session\"\t\"Files\""
 end
 
-@f_TESTNOTES = File.new( metricsdir + '/testnotes.txt', 'w' )
+@f_TESTNOTES = File.new( metrics_dir + '/testnotes.txt', 'w' )
 @f_TESTNOTES.puts "\"Session\"\t\"Notes\""
 
-@f_BUGS = File.new( metricsdir + '/bugs.txt', 'w' )
+@f_BUGS = File.new( metrics_dir + '/bugs.txt', 'w' )
 @f_BUGS.puts "\"Session\"\t\"Bugs\"\t\"ID\""
 
-@f_ISSUES = File.new( metricsdir + '/issues.txt', 'w' )
+@f_ISSUES = File.new( metrics_dir + '/issues.txt', 'w' )
 @f_ISSUES.puts "\"Session\"\t\"Issues\"\t\"ID\""
 
 # Create a hash of arrays to collect the session sheet data used in the report generation
@@ -1028,7 +1033,7 @@ end
 
 unless todo.empty?
 
-  @f_CHARTERS = File.new( metricsdir + '/charters-todo.txt', 'w+')
+  @f_CHARTERS = File.new( metrics_dir + '/charters-todo.txt', 'w+')
   @f_CHARTERS.puts "\"Session\"\t\"Field\"\t\"Value\""
 
   todo.each do |@file|
@@ -1107,7 +1112,7 @@ unless todo.empty?
     
     # For the record, I have no idea why we are overwriting the same file here.
     # This new 'charters-todo.txt' file is practically identical to the 'todo.txt' file in the 'todo' folder.
-    f_CHARTERS = File.new( metricsdir + '/charters-todo.txt', 'w')
+    f_CHARTERS = File.new( metrics_dir + '/charters-todo.txt', 'w')
     f_CHARTERS.puts "\"Title\"\t\"Area\"\t\"Priority\"\t\"Description\""
     
     title = ''
@@ -1172,7 +1177,7 @@ end
 if @include_switch['Areas']
   testarea = Hash.new { |h,k| h[k] = [] }
   
-  f_CHARTERS = File.open( metricsdir + '/charters.txt' )
+  f_CHARTERS = File.open( metrics_dir + '/charters.txt' )
   f_CHARTERS.gets     # (ignore heading line)
   f_CHARTERS.each_line { |line| testarea[ line.split('"')[5] ] << line.split('"')[1]  if ( line.split('"')[3] == 'AREA' ) }     # ( testarea[ area ] << [session] )
   f_CHARTERS.close
@@ -1180,12 +1185,12 @@ end
 
 testers = Hash.new { |h,k| h[k] = [] }
 
-f_TESTERS = File.open( metricsdir + '/testers.txt' )
+f_TESTERS = File.open( metrics_dir + '/testers.txt' )
 f_TESTERS.gets     # (ignore heading line)
 f_TESTERS.each_line { |line| testers[ line.split('"')[3] ] << line.split('"')[1] }     # ( testers[ tester_name ] << [session] )
 f_TESTERS.close
 
-f_DAYBREAKS = File.new( metricsdir + '/breakdowns-day.txt', 'w' )
+f_DAYBREAKS = File.new( metrics_dir + '/breakdowns-day.txt', 'w' )
 f_DAYBREAKS.puts "\"Date\"\t\"Total\"\t\"On Charter\"\t\"Opportunity\"\t\"Test\"\t\"Bug\"\t\"Setup\"\t\"Bugs\"\t\"Issues\""
 
 n_total = {}
@@ -1223,13 +1228,13 @@ end
 
 f_DAYBREAKS.close
 
-f_TDAYBREAKS = File.new( metricsdir + '/breakdowns-tester-day.txt', 'w' )
+f_TDAYBREAKS = File.new( metrics_dir + '/breakdowns-tester-day.txt', 'w' )
 f_TDAYBREAKS.puts "\"Tester\"\t\"Date\"\t\"Total\"\t\"On Charter\"\t\"Opportunity\"\t\"Test\"\t\"Bug\"\t\"Setup\"\t\"Bugs\"\t\"Issues\""
 
-f_TESTERTOTALS = File.new( metricsdir + '/breakdowns-testers-total.txt', 'w' )
+f_TESTERTOTALS = File.new( metrics_dir + '/breakdowns-testers-total.txt', 'w' )
 f_TESTERTOTALS.puts "\"Tester\"\t\"Total\"\t\"On Charter\"\t\"Opportunity\"\t\"Test\"\t\"Bug\"\t\"Setup\"\t\"Bugs\"\t\"Issues\""
 
-f_TESTERBREAKS = File.new( metricsdir + '/breakdowns-testers-sessions.txt', 'w' )
+f_TESTERBREAKS = File.new( metrics_dir + '/breakdowns-testers-sessions.txt', 'w' )
 f_TESTERBREAKS.puts "\"Session\"\t" + 
   "\"Start\"\t" + 
   "\"Time\"\t" + 
@@ -1356,7 +1361,7 @@ f_TESTERBREAKS.close
 
 if @include_switch['Areas']
 
-  f_COVERAGEBREAKS = File.new( metricsdir + '/breakdowns-coverage-sessions.txt', 'w' )
+  f_COVERAGEBREAKS = File.new( metrics_dir + '/breakdowns-coverage-sessions.txt', 'w' )
   f_COVERAGEBREAKS.puts "\"Session\"\t" + 
     "\"Start\"\t" + 
     "\"Time\"\t" + 
@@ -1377,7 +1382,7 @@ if @include_switch['Areas']
     "\"Testers\"\t" + 
     '"Area"'
   
-  f_COVERAGETOTALS = File.new( metricsdir + '/breakdowns-coverage-total.txt', 'w' )
+  f_COVERAGETOTALS = File.new( metrics_dir + '/breakdowns-coverage-total.txt', 'w' )
   f_COVERAGETOTALS.puts "\"Total\"\t\"On Charter\"\t\"Opportunity\"\t\"Test\"\t\"Bug\"\t\"Setup\"\t\"Bugs\"\t\"Issues\"\t\"Area\""
 
   @areas_list.sort.each do |area|
@@ -1474,7 +1479,7 @@ resorted_array = []
 @sessions.each { |file_name, data| resorted_array << file_name.to_a + data }
 resorted_array.sort! { |a,b| Time.parse( b[1]+' '+b[2] ) <=> Time.parse( a[1]+' '+a[2] ) }
 
-f_BREAKDOWNS = File.new( metricsdir + '/breakdowns.txt', 'w' )
+f_BREAKDOWNS = File.new( metrics_dir + '/breakdowns.txt', 'w' )
 f_BREAKDOWNS.puts "\"Session\"\t" +
     "\"Start\"\t" +
     "\"Time\"\t" +
