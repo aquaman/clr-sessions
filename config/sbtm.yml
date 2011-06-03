@@ -1,7 +1,13 @@
 # This is the configuration file for the Command-Line Ruby Session-Based Testing framework
 # Note: when editing this file, never use tabs for indenting - use spaces instead
 
-# set an option to 'true' if you include the section in your session sheets
+# Identify yourself. This will uniquely identify your sessions.
+# You may specify either 2 or 3 initials
+tester_ID:
+  full name: 
+  initials:  
+
+# Set an option to 'true' if you include the section in your session sheets
 scan_options:
   LTTD:       false
   Areas:      true
@@ -11,21 +17,20 @@ scan_options:
   Data Files: true
   Warnings:   false
 
-# specify absolute or relative paths.
+# Folders - specify absolute or relative paths
 # Relative paths start from the script run location - e.g. starting from c:\sessions
 folders:
-  config_dir:       config
   data_dir:         datafiles
   metrics_dir:      reports
   report_dir:       reports
   report_templates: config/templates
   todo_dir:         todo
 
-# if you blank out the filename, output will be written to the console
+# If you blank out the filename, output will be written to the console
 output:
   logfile: scan.log
 
-# all times are specified in minutes
+# All times are specified in minutes
 timebox:
   short:   60
   normal:  90
