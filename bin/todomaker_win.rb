@@ -12,14 +12,14 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 30 May 2011
+# Last Updated:: 02 June 2011
 # Version:: 2.0
 # -----
 
 if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbtm.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
-  puts "\nUsage: #{File.basename($0)} CONFIG_DIR INPUT_FILE"
-  puts "\nWhere CONFIG_DIR is the path to the directory containing SBTM.YML"
-  puts "and   INPUT_FILE is the 'todo.xls' input file"
+  puts "\nUsage: #{File.basename($0)} config_dir input_file"
+  puts "\nWhere 'config_dir' is the path to the directory containing SBTM.YML"
+  puts "and   'input_file' is the 'todo.xls' input file"
   exit
 end
 

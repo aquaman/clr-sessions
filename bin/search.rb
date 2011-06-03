@@ -9,15 +9,15 @@
 # * 1 Optional - where to put search results -- defaults to current directory
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 30 May 2011
+# Last Updated:: 02 June 2011
 # Version:: 2.0
 # -----
 
 if ARGV[0].nil?
   puts "\nSearch all the *.SES files in a specified folder for specific keyword(s)"
-  puts "\nUsage: #{File.basename($0)} SCAN_DIR [OUTPUT_DIR]"
-  puts "\nSCAN_DIR is the path to the directory containing the session sheets"
-  puts "[OUTPUT_DIR] = optional folder location to store search results"
+  puts "\nUsage: #{File.basename($0)} scan_dir [output_dir]"
+  puts "\n'scan_dir' is the path to the directory containing the session sheets"
+  puts "[output_dir] = optional folder location to store search results"
   puts "(if left blank, will use current location = " + Dir.pwd + " )\n"
   exit
 end
@@ -56,9 +56,9 @@ end
 
 ### START ###
 
-scandir = ARGV[0]
+scan_dir = ARGV[0]
 
-print "\nEnter the text to search for in '#{scandir}' : "
+print "\nEnter the text to search for in '#{scan_dir}' : "
 search_string = $stdin.gets.chomp
 
 exit if search_string.empty?
@@ -67,7 +67,7 @@ exit if search_string.empty?
 f_BATCH = File.new( output_dir + '/sheets.bat', 'w' )
 f_BATCH.puts '@ECHO OFF'
 
-sheets = Dir[ scandir + '/*.ses' ]
+sheets = Dir[ scan_dir + '/*.ses' ]
 
 ##
 # Sort the file list - ET sessions chronologically, then alphabetical; followed by sorted TODO sessions, if any.
