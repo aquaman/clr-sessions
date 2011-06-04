@@ -179,19 +179,19 @@ def parse_file
   while ( line = f_SESSION.gets )
     # NOTE: These session sheet section headings *must* be in all CAPS.
     if ( line =~ /^CHARTER/)
-      error("More than one CHARTER section")  if ( charter_found )
+      error("More than one CHARTER section found")  if ( charter_found )
       line = f_SESSION.gets     # automatically skip the next line (should be dashed line)
       charter_found = true
       reference_array = @charter_contents
       next
     elsif ( line =~ /^START/)
-      error("More than one START section")  if ( start_found )
+      error("More than one START section found")  if ( start_found )
       line = f_SESSION.gets
       start_found = true
       reference_array = @start_contents
       next
     elsif ( line =~ /^TESTER/)
-      error("More than one TESTER section")  if ( tester_found )
+      error("More than one TESTER section found")  if ( tester_found )
       line = f_SESSION.gets
       tester_found = true
       reference_array = @tester_contents
@@ -200,7 +200,7 @@ def parse_file
       # Separate out any content found here even if @include_switch['Task'] = false
       # this will make sure that this content doesn't mistakenly get added to the section above in the session sheet.
       
-      error("More than one TASK BREAKDOWN section")  if ( breakdown_found )
+      error("More than one TASK BREAKDOWN section found")  if ( breakdown_found )
       line = f_SESSION.gets
       breakdown_found = true
       reference_array = @breakdown_contents
@@ -220,19 +220,19 @@ def parse_file
       
       next
     elsif ( line =~ /^TEST NOTES/)
-      error("More than one TEST NOTES section")  if ( testnotes_found )
+      error("More than one TEST NOTES section found")  if ( testnotes_found )
       line = f_SESSION.gets
       testnotes_found = true
       reference_array = @testnotes_contents
       next
     elsif ( line =~ /^BUGS/)
-      error("More than one BUGS section")  if ( bugs_found )
+      error("More than one BUGS section found")  if ( bugs_found )
       line = f_SESSION.gets
       bugs_found = true
       reference_array = @bugs_contents
       next
     elsif ( line =~ /^ISSUES/)
-      error("More than one ISSUES section")  if ( issues_found )
+      error("More than one ISSUES section found")  if ( issues_found )
       line = f_SESSION.gets
       issues_found = true
       reference_array = @issues_contents
@@ -451,11 +451,11 @@ end
 # * several calculations using combinations of the above along with the number of testers in a given session
 #
 def parse_breakdown( num_testers )
-  dur_found = false ;  dur_happened = false
-  tde_found = false ;  tde_happened = false
-  bir_found = false ;  bir_happened = false
-  set_found = false ;  set_happened = false
-  cvo_found = false ;  cvo_happened = false
+  dur_section_found = false ;  dur_content_found = false
+  tde_section_found = false ;  tde_content_found = false
+  bir_section_found = false ;  bir_content_found = false
+  set_section_found = false ;  set_content_found = false
+  cvo_section_found = false ;  cvo_content_found = false
   
   in_section = ''
   dur_val = ''
@@ -473,8 +473,8 @@ def parse_breakdown( num_testers )
     case line
     when /^#DURATION/
       if @include_switch['Duration']
-        error('More than one #DURATION hashtag found in TASK BREAKDOWN section') if ( dur_found )
-        dur_found = true
+        error('More than one #DURATION hashtag found in TASK BREAKDOWN section') if ( dur_section_found )
+        dur_section_found = true
         in_section = 'DUR'
       else
         warning('#DURATION section found but skipped due to SCAN switch used.')
@@ -482,8 +482,8 @@ def parse_breakdown( num_testers )
       next
     when /^#TEST DESIGN AND EXECUTION/
       if @include_switch['TBS']
-        error('More than one #TEST DESIGN AND EXECUTION hashtag found in TASK BREAKDOWN section') if ( tde_found )
-        tde_found = true
+        error('More than one #TEST DESIGN AND EXECUTION hashtag found in TASK BREAKDOWN section') if ( tde_section_found )
+        tde_section_found = true
         in_section = 'TDE'
       else
         warning('#TEST DESIGN AND EXECUTION section found but skipped due to SCAN switch used.')
@@ -491,8 +491,8 @@ def parse_breakdown( num_testers )
       next
     when /^#BUG INVESTIGATION AND REPORTING/
       if @include_switch['TBS']
-        error('More than one #BUG INVESTIGATION AND REPORTING hashtag found in TASK BREAKDOWN section') if ( bir_found )
-        bir_found = true
+        error('More than one #BUG INVESTIGATION AND REPORTING hashtag found in TASK BREAKDOWN section') if ( bir_section_found )
+        bir_section_found = true
         in_section = 'BIR'
       else
         warning('#BUG INVESTIGATION AND REPORTING section found but skipped due to SCAN switch used.')
@@ -500,8 +500,8 @@ def parse_breakdown( num_testers )
       next
     when /^#SESSION SETUP/
       if @include_switch['TBS']
-        error('More than one #SESSION SETUP hashtag found in TASK BREAKDOWN section') if ( set_found )
-        set_found = true
+        error('More than one #SESSION SETUP hashtag found in TASK BREAKDOWN section') if ( set_section_found )
+        set_section_found = true
         in_section = 'SET'
       else
         warning('#SESSION SETUP section found but skipped due to SCAN switch used.')
@@ -509,8 +509,8 @@ def parse_breakdown( num_testers )
       next
     when /^#CHARTER VS. OPPORTUNITY/
       if @include_switch['C vs O']
-        error('More than one #CHARTER VS. OPPORTUNITY hashtag found in TASK BREAKDOWN section') if ( cvo_found )
-        cvo_found = true
+        error('More than one #CHARTER VS. OPPORTUNITY hashtag found in TASK BREAKDOWN section') if ( cvo_section_found )
+        cvo_section_found = true
         in_section = 'CVO'
       else
         warning('#CHARTER VS. OPPORTUNITY section found but skipped due to SCAN switch used.')
@@ -520,8 +520,8 @@ def parse_breakdown( num_testers )
       
     case in_section
     when 'DUR'
-      if ( ! dur_happened )
-        dur_happened = true
+      if ( ! dur_content_found )
+        dur_content_found = true
         
         (dur_val, dur_times) = line.split('*')
         dur_val.strip!
@@ -544,8 +544,8 @@ def parse_breakdown( num_testers )
       end
       
     when 'TDE'
-      if ( ! tde_happened )
-        tde_happened = true
+      if ( ! tde_content_found )
+        tde_content_found = true
         
         test_val = line
         if ( test_val.to_i < 0 or test_val.to_i > 100 ) or ( line =~ /\D+/ )
@@ -556,8 +556,8 @@ def parse_breakdown( num_testers )
       end
       
     when 'BIR'
-      if ( ! bir_happened )
-        bir_happened = true
+      if ( ! bir_content_found )
+        bir_content_found = true
         
         bug_val = line
         if ( bug_val.to_i < 0 or bug_val.to_i > 100) or ( line =~ /\D+/ )
@@ -568,8 +568,8 @@ def parse_breakdown( num_testers )
       end
       
     when 'SET'
-      if ( ! set_happened )
-        set_happened = true
+      if ( ! set_content_found )
+        set_content_found = true
         
         prep_val = line
         if ( prep_val.to_i < 0 or prep_val.to_i > 100) or ( line =~ /\D+/ )
@@ -580,8 +580,8 @@ def parse_breakdown( num_testers )
       end
       
     when 'CVO'
-      if ( ! cvo_happened )
-        cvo_happened = true
+      if ( ! cvo_content_found )
+        cvo_content_found = true
         
         if ( line !~ /^\d+\s*\/\s*\d+/ )
           error("Unexpected #CHARTER VS. OPPORTUNITY value \"#{line}\" in TASK BREAKDOWN section. Ensure that the values are integers from 0-100 separated by '/'.")
@@ -611,11 +611,11 @@ def parse_breakdown( num_testers )
     end
   end
   
-  error('Missing #DURATION field in TASK BREAKDOWN section') if @include_switch['Duration'] and ( ( ! dur_found ) or ( dur_found and ! dur_happened) )
-  error('Missing #TEST DESIGN AND EXECUTION field in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! tde_found ) or ( tde_found and ! tde_happened) )
-  error('Missing #BUG INVESTIGATION AND REPORTING field in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! bir_found ) or ( bir_found and ! bir_happened) )
-  error('Missing #SESSION SETUP field in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! set_found ) or ( set_found and ! set_happened) )
-  error('Missing #CHARTER VS. OPPORTUNITY field in TASK BREAKDOWN section') if @include_switch['C vs O'] and ( ( ! cvo_found ) or ( cvo_found and ! cvo_happened) )
+  error('Missing #DURATION in TASK BREAKDOWN section') if @include_switch['Duration'] and ( ( ! dur_section_found ) or ( dur_section_found and ! dur_content_found) )
+  error('Missing #TEST DESIGN AND EXECUTION in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! tde_section_found ) or ( tde_section_found and ! tde_content_found) )
+  error('Missing #BUG INVESTIGATION AND REPORTING in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! bir_section_found ) or ( bir_section_found and ! bir_content_found) )
+  error('Missing #SESSION SETUP in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! set_section_found ) or ( set_section_found and ! set_content_found) )
+  error('Missing #CHARTER VS. OPPORTUNITY in TASK BREAKDOWN section') if @include_switch['C vs O'] and ( ( ! cvo_section_found ) or ( cvo_section_found and ! cvo_content_found) )
   
   if @include_switch['TBS'] and ( ( prep_val.to_i + test_val.to_i + bug_val.to_i ) != 100 )
     error('Unexpected sum of TASK BREAKDOWN values. Values of #SESSION SETUP, #TEST DESIGN AND EXECUTION, and #BUG INVESTIGATION AND REPORTING must add up to 100')
@@ -1134,6 +1134,9 @@ if @include_switch['Duration']
 
   # Perform the Date-Time Collision Validation (DTCV) :
   dtcv_data.each_key do |tester|
+    # For each tester in the data set, check to make sure that consecutive test sessions 
+    # do NOT overlap by a significant amount of time. 
+    # This value is specified in the SBTM.YML config file: @timebox['allowable_session_overlap']
     
     tester_data = []
     tester_data = dtcv_data[ tester ].sort { |x,y| (x[0] <=> y[0]) }
@@ -1144,22 +1147,22 @@ if @include_switch['Duration']
       data_points.times do |x|
         if x + 1 < data_points
           
-          tester_A = tester_data[ x ]
-          tester_B = tester_data[ x + 1 ]
+          session_A = tester_data[ x ]
+          session_B = tester_data[ x + 1 ]
           
-          first_start_time = Time.at( tester_A[1] )
-          first_end_time = first_start_time + ( tester_A[2] * 60 )
-          second_start_time = Time.at( tester_B[1] )
+          first_start_time = Time.at( session_A[1] )
+          first_end_time = first_start_time + ( session_A[2] * 60 )
+          second_start_time = Time.at( session_B[1] )
           
           if ( first_start_time == second_start_time )
             # Check for copy-and-paste errors - identical timestamps
             @errors_found = true
-            output( "\n*** Error : START timestamps for two sessions are identical: \"#{ tester_A[ 0 ] }\" and \"#{ tester_B[ 0 ] }\"" )
+            output( "\n*** Error : START timestamps for two sessions are identical: \"#{ session_A[ 0 ] }\" and \"#{ session_B[ 0 ] }\"" )
           
           elsif ( second_start_time < ( first_end_time - (@timebox['allowable_session_overlap'] * 60) ) )
             # Check for session collisions - i.e. ones that start before the last one has ended (allowing for a configurable amount of overlap - e.g. 5 mins)
             @errors_found = true
-            output( "\n*** Error : START timestamp in \"#{ tester_B[ 0 ] }\" begins *before* the previous session \"#{ tester_A[ 0 ] }\" has ended!" )
+            output( "\n*** Error : START timestamp in \"#{ session_B[ 0 ] }\" begins *before* the previous session \"#{ session_A[ 0 ] }\" has ended!" )
           end
           
         end
