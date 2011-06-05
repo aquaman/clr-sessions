@@ -18,7 +18,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 03 June 2011
+# Last Updated:: 05 June 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
@@ -970,13 +970,14 @@ end
 
 # Parse the Session sheets:
 
-@sheets.sort.each do |@file|
-  file_name = File.basename( @file )
+@sheets.sort.each do |file_path|
+  file_name = File.basename( file_path )
   if ( file_name !~ /^et-\w{2,3}-\d{6}-\w\.ses/ )
     # if the filename isn't correct, skip the sheet and go to the next one
     error("Unexpected session file name. If it's a session sheet, its name must be: \"ET-<tester initials>-<yymmdd>-<A, B, C, etc.>.SES\". If it's a TODO sheet, its name must be: \"ET-TODO-<priority number>-<title>.SES\"")
   else
-  
+    
+    @file = file_path
     # DTCV variables :
     testers = []
     datetime = 0
@@ -1036,7 +1037,8 @@ unless todo.empty?
   @f_CHARTERS = File.new( metrics_dir + '/charters-todo.txt', 'w+')
   @f_CHARTERS.puts "\"Session\"\t\"Field\"\t\"Value\""
 
-  todo.each do |@file|
+  todo.each do |file_path|
+    @file = file_path
     parse_file
     parse_charter( 'todo' )
     parse_start( 'todo' )
@@ -1479,7 +1481,7 @@ end
 
 ## Re-Sort the Sessions (descending by Date+Time) and output to the Breakdowns file :
 resorted_array = []
-@sessions.each { |file_name, data| resorted_array << file_name.to_a + data }
+@sessions.each { |file_name, data| resorted_array << data.unshift( file_name ) }
 resorted_array.sort! { |a,b| Time.parse( b[1]+' '+b[2] ) <=> Time.parse( a[1]+' '+a[2] ) }
 
 f_BREAKDOWNS = File.new( metrics_dir + '/breakdowns.txt', 'w' )
