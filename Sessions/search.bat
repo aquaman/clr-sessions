@@ -4,9 +4,9 @@
 ::
 
 : # Delete output file, if present
-DEL sheets.txt
+DEL search_results_sheets.txt
 
 : # Search the specified folder and save the output in the current folder
 bin\search.rb approved
 
-START sheets.txt
+IF EXIST search_results_sheets.txt START search_results_sheets.txt

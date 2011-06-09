@@ -9,7 +9,7 @@
 # * 1 Optional - where to put search results -- defaults to current directory
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 02 June 2011
+# Last Updated:: 08 June 2011
 # Version:: 2.0
 # -----
 
@@ -59,19 +59,15 @@ end
 scan_dir = ARGV[0]
 
 print "\nEnter the text to search for in '#{scan_dir}' : "
-search_string = $stdin.gets.chomp
+search_string = $stdin.gets.strip
 
 exit if search_string.empty?
-
-@f_CONCAT = File.new( output_dir + '/sheets.txt', 'w' )
-f_BATCH = File.new( output_dir + '/sheets.bat', 'w' )
-f_BATCH.puts '@ECHO OFF'
-
-sheets = Dir[ scan_dir + '/*.ses' ]
 
 ##
 # Sort the file list - ET sessions chronologically, then alphabetical; followed by sorted TODO sessions, if any.
 #
+sheets = Dir[ scan_dir + '/*.ses' ]
+
 todo_list = []
 sheets.each {|x| todo_list << x  if ( x =~ /et-todo/ ) }
 sheets.delete_if {|x| x =~ /et-todo/ } unless todo_list.empty?
@@ -88,27 +84,49 @@ sorted_files = sheets + todo_list.sort!
 ##
 # Examine each file in the list for the search string. Stop searching a file at the first match found.
 #
+
 hits = 0
-sorted_files.each do | file |
-  @f_SHEET = File.open( file )
+if sorted_files.empty?
+
+  puts 'No session sheets found in the target folder specified.'
+
+else
+
+  @f_CONCAT = File.new( output_dir + '/search_results_sheets.txt', 'w' )
+  f_BATCH = File.new( output_dir + '/open_search_results_sheets.bat', 'w' )
+  f_BATCH.puts '@ECHO OFF'
+  f_BATCH.puts ': This file was automatically created by "search.rb"'
+  f_BATCH.puts ': The session sheets below match the search criteria:'
+  f_BATCH.puts ': "' + search_string + '"'
+  f_BATCH.puts ':'
+
   match_found = false
-  while ( line = @f_SHEET.gets ) and ( ! match_found )
-    if ( line =~ /#{search_string}/io)
-      puts file
-      f_BATCH.puts 'start notepad ' + File.expand_path( file )
-      concat( file )
-      hits += 1
-      match_found = true
+  sorted_files.each do | file |
+    @f_SHEET = File.open( file )
+    match_found = false
+    while ( line = @f_SHEET.gets ) and ( ! match_found )
+      if ( line =~ /#{search_string}/io)
+        f_BATCH.puts 'start notepad ' + File.expand_path( file )
+        concat( file )
+        hits += 1
+        match_found = true
+      end
     end
+    @f_SHEET.close
   end
-  @f_SHEET.close
+
+  if hits.zero?
+    f_BATCH.puts ': <no matches found>'
+    @f_CONCAT.puts 'no matches found'
+  end
+
 end
 
 puts "\n#{hits} file(s) were found that matched your search."
 
 unless hits.zero?
-  puts "\nType SHEETS.BAT to view each matching file in Notepad."
-  puts "Open SHEETS.TXT to view the contents of all the matching files together."
+  puts "\nType 'open_search_results_sheets.bat' to view each matching file in Notepad."
+  puts "Open 'search_results_sheets.txt' to view the contents of all the matching files together."
 end
 
 ### END ###
