@@ -18,7 +18,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 05 June 2011
+# Last Updated:: 08 June 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
@@ -32,9 +32,10 @@ if ( ARGV.length < 2 ) or ! File.exist?( ARGV[0] + '/sbtm.yml' ) or ! FileTest.d
   exit
 end
 
-# Load some basic Ruby libraries - YAML and Time.
+# Load Ruby libraries - YAML, Date and Time
 require 'yaml'
-require 'Time' unless Time.methods.include? 'parse'
+require 'date'
+require 'time'
 
 # Read the Configuration file:
 config_dir = ARGV[0]
@@ -398,9 +399,7 @@ def parse_start( session_type = 'test' )
   fn_day = ''
   fn_month = ''
   fn_year = ''
-  start_date = ''
-  start_time = ''
-  datetime_value = 0
+  time_line = 0
 
   File.basename( @file ) =~ /-(\d\d)(\d\d)(\d\d)-/
   fn_year = $1
@@ -410,8 +409,13 @@ def parse_start( session_type = 'test' )
   @start_contents.delete_if {|x| x.strip.empty? }
   @start_contents.each do |line|
     line.strip!
-    if (line =~ /^(\d+)\/(\d+)\/(\d{2,4})\s+(\d+):(\d+)\s*(am|pm)?$/i)
-      time_line = Time.parse( line )
+    if (line =~ /^(\d+)\/(\d+)\/(\d{2,4})\s+(.+)/)
+      # create a Time object to work with:
+      # reference: $1 = month, $2 = day, $3 = year, $4 = time stamp
+      # ASSUMPTION ALERT: This date conversion has a defined format of mm/dd/yy
+      # Time.parse method needs date format in yyyy-mm-dd format to work correctly with all versions of Ruby
+      time_line = Time.parse( "#{$3}-#{$1}-#{$2} #{$4}" )
+      
       if ( time_found )
         error('Multiple time stamps detected in START section')
       else
@@ -420,10 +424,6 @@ def parse_start( session_type = 'test' )
         if ((( time_line.mon != fn_month ) or ( time_line.day != fn_day) or ( time_line.strftime("%y") != fn_year )) and session_type == 'test' )
           error('File name does not match date in START section')
         end
-        # (Aside: no longer stripping the leading 0's from the date and time values in the reports - makes for nicer formatting)
-        start_date = time_line.strftime("%m/%d/%y")
-        start_time = time_line.strftime("%I:%M %p").downcase
-        datetime_value = time_line.to_i
       end
     elsif ( ! line.empty? )
       error("Unexpected text found \"#{line}\" in START section. Ensure that the time stamp is in this format: mm/dd/yyyy hh:mm{am|pm}. 12-hr or 24-hr time format works.")
@@ -432,7 +432,7 @@ def parse_start( session_type = 'test' )
   error('Missing time stamp in START section') if (! time_found && session_type == 'test' )
   error('START section must be empty if the sheet is named as a TODO. Did you forget to rename the session sheet?') if ( time_found && session_type == 'todo' )
   
-  return start_date, start_time, datetime_value
+  return time_line
 end
 
 ##
@@ -906,8 +906,23 @@ end
 ### START ###
 
 # Begin scan :
-
 @errors_found = false
+
+# Get the file lists :
+@sheets = Dir[ scan_dir + '/*.ses' ]
+@sheets.map! {|x| x.downcase }
+
+todo = []
+@sheets.each {|x| todo << x  if ( x =~ /et-todo/ ) }
+
+# (exclude the "et-TODO-*.ses" files)
+@sheets.delete_if {|x| x =~ /et-todo/ } unless todo.empty?
+
+# Stop now if there's nothing to scan:
+if @sheets.empty? and todo.empty?
+  output( 'Nothing to scan.' )
+  exit
+end
 
 # Read in config files - if required:
 if @include_switch['Areas']
@@ -927,16 +942,6 @@ if @include_switch['LTTD']
   end
   f_LTTD_INI.close
 end
-
-# Get the file lists :
-@sheets = Dir[ scan_dir + '/*.ses' ]
-@sheets.map! {|x| x.downcase }
-
-todo = []
-@sheets.each {|x| todo << x  if ( x =~ /et-todo/ ) }
-
-# (exclude the "et-TODO-*.ses" files)
-@sheets.delete_if {|x| x =~ /et-todo/ } unless todo.empty?
 
 # Open files we will use to capture session data:
 
@@ -982,7 +987,6 @@ end
     testers = []
     datetime = 0
     duration = 0
-    start_times = []
     breakdown_values = []
     
     # Parse the file into different sections (arrays), examine each in turn for errors and collect the data :
@@ -992,9 +996,8 @@ end
     
     parse_charter
     
-    start_times = parse_start
-    datetime = start_times.pop
-    @sessions[ file_name ] << start_times
+    datetime = parse_start
+    @sessions[ file_name ] << datetime
     
     if @include_switch['Task']
       breakdown_values = parse_breakdown( tester_count )
@@ -1014,7 +1017,7 @@ end
     if @include_switch['Duration']
       # collect the DTCV data :
       duration = breakdown_values.first.to_f * @timebox['normal']
-      unless testers.empty? or datetime.zero? or duration.zero?
+      unless testers.empty? or ( datetime == 0 ) or duration.zero?
         testers.each { |name| dtcv_data[ name.downcase ] << [ file_name.upcase, datetime, duration.to_i ] }
       end
     end
@@ -1152,9 +1155,9 @@ if @include_switch['Duration']
           session_A = tester_data[ x ]
           session_B = tester_data[ x + 1 ]
           
-          first_start_time = Time.at( session_A[1] )
+          first_start_time = session_A[1]
           first_end_time = first_start_time + ( session_A[2] * 60 )
-          second_start_time = Time.at( session_B[1] )
+          second_start_time = session_B[1]
           
           if ( first_start_time == second_start_time )
             # Check for copy-and-paste errors - identical timestamps
@@ -1208,19 +1211,19 @@ bugs = {}
 issues = {}
 
 @sessions.each do |key, value|
-  date = value[0]
-  n_total.has_key?( date ) ?        n_total[ date ] += value[8] :         n_total[ date ] = value[8]
-  n_charter.has_key?( date ) ?      n_charter[ date ] += value[9] :       n_charter[ date ] = value[9]
-  n_opportunity.has_key?( date ) ?  n_opportunity[ date ] += value[10] :  n_opportunity[ date ] = value[10]
-  n_test.has_key?( date ) ?         n_test[ date ] += value[11] :         n_test[ date ] = value[11]
-  n_bug.has_key?( date ) ?          n_bug[ date ] += value[12] :          n_bug[ date ] = value[12]
-  n_prep.has_key?( date ) ?         n_prep[ date ] += value[13] :         n_prep[ date ] = value[13]
-  bugs.has_key?( date ) ?           bugs[ date ] += value[14] :           bugs[ date ] = value[14]
-  issues.has_key?( date ) ?         issues[ date ] += value[15] :         issues[ date ] = value[15]
+  date = Date.parse( value[0].to_s )    # (this creates a 'date' object)
+  n_total.has_key?( date ) ?        n_total[ date ] += value[7] :         n_total[ date ] = value[7]
+  n_charter.has_key?( date ) ?      n_charter[ date ] += value[8] :       n_charter[ date ] = value[8]
+  n_opportunity.has_key?( date ) ?  n_opportunity[ date ] += value[9] :   n_opportunity[ date ] = value[9]
+  n_test.has_key?( date ) ?         n_test[ date ] += value[10] :         n_test[ date ] = value[10]
+  n_bug.has_key?( date ) ?          n_bug[ date ] += value[11] :          n_bug[ date ] = value[11]
+  n_prep.has_key?( date ) ?         n_prep[ date ] += value[12] :         n_prep[ date ] = value[12]
+  bugs.has_key?( date ) ?           bugs[ date ] += value[13] :           bugs[ date ] = value[13]
+  issues.has_key?( date ) ?         issues[ date ] += value[14] :         issues[ date ] = value[14]
 end
 
-n_total.sort { |a,b| Time.parse( b[0] ) <=> Time.parse( a[0] ) }.each do | date, value |     # (descending Date sort)
-  f_DAYBREAKS.puts '"' + date + "\"\t\"" + 
+n_total.sort { |a,b| b[0] <=> a[0] }.each do | date, value |     # (descending Date sort)
+  f_DAYBREAKS.puts '"' + date.strftime("%Y-%m-%d") + "\"\t\"" + 
     n_total[ date ].to_s + "\"\t\"" + 
     n_charter[ date ].to_s + "\"\t\"" + 
     n_opportunity[ date ].to_s + "\"\t\"" + 
@@ -1273,27 +1276,27 @@ testers.each do | tester_name, sess_arr |
   tissues = {} ;         dissues = {}
   
   sess_arr.each do | sess_name |
-    start         = @sessions[ sess_name ][0]
-    time          = @sessions[ sess_name ][1]
-    duration      = @sessions[ sess_name ][2]
-    oncharter     = @sessions[ sess_name ][3]
-    onopportunity = @sessions[ sess_name ][4]
-    test          = @sessions[ sess_name ][5]
-    bug           = @sessions[ sess_name ][6]
-    prep          = @sessions[ sess_name ][7]
-    n_total       = @sessions[ sess_name ][8]
-    n_charter     = @sessions[ sess_name ][9]
-    n_opportunity = @sessions[ sess_name ][10]
-    n_test        = @sessions[ sess_name ][11]
-    n_bug         = @sessions[ sess_name ][12]
-    n_prep        = @sessions[ sess_name ][13]
-    bugs          = @sessions[ sess_name ][14].to_f     # (to help more accurately split counts between multiple testers)
-    issues        = @sessions[ sess_name ][15].to_f
-    testers       = @sessions[ sess_name ][16]
+    start         = Date.parse( @sessions[ sess_name ][0].to_s )
+    time          = @sessions[ sess_name ][0]
+    duration      = @sessions[ sess_name ][1]
+    oncharter     = @sessions[ sess_name ][2]
+    onopportunity = @sessions[ sess_name ][3]
+    test          = @sessions[ sess_name ][4]
+    bug           = @sessions[ sess_name ][5]
+    prep          = @sessions[ sess_name ][6]
+    n_total       = @sessions[ sess_name ][7]
+    n_charter     = @sessions[ sess_name ][8]
+    n_opportunity = @sessions[ sess_name ][9]
+    n_test        = @sessions[ sess_name ][10]
+    n_bug         = @sessions[ sess_name ][11]
+    n_prep        = @sessions[ sess_name ][12]
+    bugs          = @sessions[ sess_name ][13].to_f     # (to help more accurately split counts between multiple testers)
+    issues        = @sessions[ sess_name ][14].to_f
+    testers       = @sessions[ sess_name ][15]
     
     f_TESTERBREAKS.puts '"' + sess_name + "\"\t\"" + 
-      start + "\"\t\"" + 
-      time + "\"\t\"" + 
+      start.strftime("%Y-%m-%d") + "\"\t\"" + 
+      time.strftime("%I:%M %p").downcase + "\"\t\"" + 
       duration + "\"\t\"" + 
       oncharter + "\"\t\"" + 
       onopportunity + "\"\t\"" + 
@@ -1320,9 +1323,8 @@ testers.each do | tester_name, sess_arr |
     tbugs.has_key?( tester_name ) ?          tbugs[ tester_name ] += ( bugs/testers ) :                   tbugs[ tester_name ] = ( bugs/testers )
     tissues.has_key?( tester_name ) ?        tissues[ tester_name ] += ( issues/testers ) :               tissues[ tester_name ] = ( issues/testers )
     
-    # As far as I can tell, these next lines are for f_TDAYBREAKS only
-    # change the date format so it correctly sorts in 'yy/mm/dd' format -- we'll switch it back later when writing to file
-    dnew_key = start[-2,2] + '/' + start[0,5] + "\t" + tester_name
+    # these next lines are for f_TDAYBREAKS only
+    dnew_key = start.to_s + "\t" + tester_name
     dn_total.has_key?( dnew_key ) ?        dn_total[ dnew_key ] += ( n_total/testers ) :             dn_total[ dnew_key ] = ( n_total/testers )
     dn_charter.has_key?( dnew_key ) ?      dn_charter[ dnew_key ] += ( n_charter/testers ) :         dn_charter[ dnew_key ] = ( n_charter/testers )
     dn_opportunity.has_key?( dnew_key ) ?  dn_opportunity[ dnew_key ] += ( n_opportunity/testers ) : dn_opportunity[ dnew_key ] = ( n_opportunity/testers )
@@ -1344,11 +1346,10 @@ testers.each do | tester_name, sess_arr |
     tbugs[ tester_name ].to_s + "\"\t\"" + 
     tissues[ tester_name ].to_s + '"'
   
-  # (Switch the date format back to 'mm/dd/yy' here)
   dn_total.sort.each do | date_name, value |
-    start = date_name.split(/\t/)[0]
+    start = Date.parse( date_name.split(/\t/)[0] )
     f_TDAYBREAKS.puts '"' + tester_name + "\"\t\"" + 
-      start[-5,5] + '/' + start[0,2] + "\"\t\"" + 
+      start.strftime("%Y-%m-%d") + "\"\t\"" + 
       dn_total[ date_name ].to_s + "\"\t\"" + 
       dn_charter[ date_name ].to_s + "\"\t\"" + 
       dn_opportunity[ date_name ].to_s + "\"\t\"" + 
@@ -1410,27 +1411,27 @@ if @include_switch['Areas']
     end
     
     sess_arr.each do | sess_name |
-      start         = @sessions[ sess_name ][0]
-      time          = @sessions[ sess_name ][1]
-      duration      = @sessions[ sess_name ][2]
-      oncharter     = @sessions[ sess_name ][3]
-      onopportunity = @sessions[ sess_name ][4]
-      test          = @sessions[ sess_name ][5]
-      bug           = @sessions[ sess_name ][6]
-      prep          = @sessions[ sess_name ][7]
-      n_total       = @sessions[ sess_name ][8]
-      n_charter     = @sessions[ sess_name ][9]
-      n_opportunity = @sessions[ sess_name ][10]
-      n_test        = @sessions[ sess_name ][11]
-      n_bug         = @sessions[ sess_name ][12]
-      n_prep        = @sessions[ sess_name ][13]
-      bugs          = @sessions[ sess_name ][14]
-      issues        = @sessions[ sess_name ][15]
-      testers       = @sessions[ sess_name ][16]
+      start         = Date.parse( @sessions[ sess_name ][0].to_s )
+      time          = @sessions[ sess_name ][0]
+      duration      = @sessions[ sess_name ][1]
+      oncharter     = @sessions[ sess_name ][2]
+      onopportunity = @sessions[ sess_name ][3]
+      test          = @sessions[ sess_name ][4]
+      bug           = @sessions[ sess_name ][5]
+      prep          = @sessions[ sess_name ][6]
+      n_total       = @sessions[ sess_name ][7]
+      n_charter     = @sessions[ sess_name ][8]
+      n_opportunity = @sessions[ sess_name ][9]
+      n_test        = @sessions[ sess_name ][10]
+      n_bug         = @sessions[ sess_name ][11]
+      n_prep        = @sessions[ sess_name ][12]
+      bugs          = @sessions[ sess_name ][13]
+      issues        = @sessions[ sess_name ][14]
+      testers       = @sessions[ sess_name ][15]
       
       f_COVERAGEBREAKS.puts '"' + sess_name + "\"\t\"" + 
-        start + "\"\t\"" + 
-        time + "\"\t\"" + 
+        start.strftime("%Y-%m-%d") + "\"\t\"" + 
+        time.strftime("%I:%M %p").downcase + "\"\t\"" + 
         duration + "\"\t\"" + 
         oncharter + "\"\t\"" + 
         onopportunity + "\"\t\"" + 
@@ -1482,7 +1483,7 @@ end
 ## Re-Sort the Sessions (descending by Date+Time) and output to the Breakdowns file :
 resorted_array = []
 @sessions.each { |file_name, data| resorted_array << data.unshift( file_name ) }
-resorted_array.sort! { |a,b| Time.parse( b[1]+' '+b[2] ) <=> Time.parse( a[1]+' '+a[2] ) }
+resorted_array.sort! { |a,b| b[1] <=> a[1] }
 
 f_BREAKDOWNS = File.new( metrics_dir + '/breakdowns.txt', 'w' )
 f_BREAKDOWNS.puts "\"Session\"\t" +
@@ -1504,7 +1505,22 @@ f_BREAKDOWNS.puts "\"Session\"\t" +
     "\"Issues\"\t" +
     "\"Testers\""
 
-resorted_array.each { |data| f_BREAKDOWNS.puts '"' + data.join("\"\t\"") + '"' }
+resorted_array.each do |data|
+  f_BREAKDOWNS.print '"'
+  data.each_index do |x|
+    if x == 1    # (i.e. the Time object)
+      f_BREAKDOWNS.print data[x].strftime("%Y-%m-%d") + "\"\t\""
+      f_BREAKDOWNS.print data[x].strftime("%I:%M %p").downcase + "\"\t\""
+    else
+      if x == (data.size - 1)
+        f_BREAKDOWNS.print data[x].to_s
+        f_BREAKDOWNS.puts '"'
+      else
+        f_BREAKDOWNS.print data[x].to_s + "\"\t\""
+      end
+    end
+  end
+end
 
 f_BREAKDOWNS.close
 

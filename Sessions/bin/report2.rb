@@ -15,7 +15,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 03 June 2011
+# Last Updated:: 08 June 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
@@ -28,7 +28,8 @@ end
 
 # Load some needed libraries
 require 'yaml'
-require 'Time' unless Time.methods.include? 'parse'
+require 'date'
+require 'time'
 
 # Read the Configuration file:
 config = YAML.load_file( ARGV[0] + '/sbtm.yml' )
@@ -166,7 +167,7 @@ def make_session( title, sortby )
   if ( sortby == 0 )
     @fields.sort! { |a,b| a[ sortby ] <=> b[ sortby ] }     # (i.e. ascending sort)
   elsif ( sortby == 1 )
-    @fields.sort! {|a,b| Time.parse( b[1]+' '+b[2] ) <=> Time.parse( a[1]+' '+a[2] ) }     # (i.e. descending date+time sort)
+    @fields.sort! {|a,b| DateTime.parse( b[1]+' '+b[2] ) <=> DateTime.parse( a[1]+' '+a[2] ) }     # (i.e. descending date+time sort)
   elsif ( sortby == 2 )
     @fields.sort! {|a,b| Time.parse( b[ sortby ] ) <=> Time.parse( a[ sortby ] ) }     # (i.e. descending time sort)
   else  # ( sortby > 2 )
