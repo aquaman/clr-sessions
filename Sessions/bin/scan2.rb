@@ -18,7 +18,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 08 June 2011
+# Last Updated:: 09 June 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
@@ -1264,7 +1264,7 @@ f_TESTERBREAKS.puts "\"Session\"\t" +
   '"Tester"'
 
 
-testers.each do | tester_name, sess_arr |
+testers.sort.each do | tester_name, session_list |
   tn_total = {} ;        dn_total = {}
   tn_charter = {} ;      dn_charter = {}
   tn_opportunity = {} ;  dn_opportunity = {}
@@ -1275,7 +1275,7 @@ testers.each do | tester_name, sess_arr |
   tbugs = {} ;           dbugs = {}
   tissues = {} ;         dissues = {}
   
-  sess_arr.each do | sess_name |
+  session_list.each do | sess_name |
     start         = Date.parse( @sessions[ sess_name ][0].to_s )
     time          = @sessions[ sess_name ][0]
     duration      = @sessions[ sess_name ][1]
@@ -1403,14 +1403,14 @@ if @include_switch['Areas']
     tissues = {}
     
     if testarea.has_key?( area )
-      sess_arr = testarea[ area ]
+      session_list = testarea[ area ]
     else
       # (fill in blanks for the Coverage.ini Areas not yet covered)
       f_COVERAGEBREAKS.puts "\"\"\t" * 18 + '"' + area + '"'
-      sess_arr = []
+      session_list = []
     end
     
-    sess_arr.each do | sess_name |
+    session_list.each do | sess_name |
       start         = Date.parse( @sessions[ sess_name ][0].to_s )
       time          = @sessions[ sess_name ][0]
       duration      = @sessions[ sess_name ][1]
