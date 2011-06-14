@@ -1,0 +1,47 @@
+Operating Systems:
+
+	Win98
+	Win2000
+
+General Features:
+	
+	Installation
+	User Manual
+	Online Help
+	UI
+	Preferences
+
+Prominent Windows:
+
+	Main Table window
+	Criteria Weights window
+	Option Ratings window
+	Documents window
+	Start-up window
+
+Managers and Wizards:
+
+	DecideRight Advisor
+	Category Label Editor
+	Numeric Editor
+	Scenario Manager
+	Report Generator
+	QuickBuild
+
+Decision Elements:
+
+	Language Elements
+	Preferences
+	Sensitivity Indicators
+	Weighting
+	Input Options
+	Decision Table
+	Options Ratings
+	Baseline
+
+Interoperability:
+
+	OLE 
+	Import / Export
+	Graphs
+	Printing

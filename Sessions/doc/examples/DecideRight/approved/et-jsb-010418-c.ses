@@ -1,0 +1,107 @@
+CHARTER
+-----------------------------------------------
+Claims: DR can help you decide who to hire or promote.  Validate this claim via a risk-testing session.  Discover the algorithm through which DR reports its results and see what kind of decision it makes? Is it way off from what they would expect.  Does it cause the user to lower their confidence in DR?
+
+#AREAS	
+OS | Win98
+Build | 1.2
+DecideRight | Main Table window
+Strategy | Claims Testing
+Strategy | Complex | Risk Testing
+
+START
+-----------------------------------------------
+4/18/01 4:00pm
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+long 
+
+#TEST DESIGN AND EXECUTION
+70
+
+#BUG INVESTIGATION AND REPORTING
+20
+
+#SESSION SETUP
+10
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+whotohire.drd
+whotohire.rtf
+drformula.xls
+
+TEST NOTES
+-----------------------------------------------
+The claim on page 1-1 says that DR can help you determine who to hire or promote.  It seems to me that the user needs to think about the candidates, examine if that feels right to them, read the report, edit the report so that it makes sense.  How can DecideRight help with this process?
+
+I used QB to put in 5 names and 5 criteria
+
+Judy
+Lexi
+Phil
+Sam
+Bill
+
+Criteria (in order of importance):
+
+Performance
+Money-Maker
+Commitment
+Management Potential
+Time With Company
+
+I weighted the crieria randomly, after which, DR says Judy is the best choice.
+
+Is DR "right"?
+
+The weighting window tells you a numeric value for each weighted criteria:
+
+From: highest rating for most important criteria =  10.00
+To:  lowest rating for least important criteria = 1.00
+
+I took the numeric value of the ratings for each of the criteria of each candidate and averaged them using Excel.  This is the result :
+
+Lexi: 8.8 / 3.54 / 10 / 4.23 / 10 = 	7.314
+Judy: 7.78 / 5.44 / 5.36 / 9.56 / 7.73 = 	7.174
+Phil: 3.14 / 10 / 7.6 / 5.58 / 5.6 = 	6.384
+Sam: 5.52 / 5.79 / 9.8 / 3.2 / 4.41 = 	5.744
+Bill: 4.83 / 3.21 / 1.75 / 8.86 / 8.37 = 	5.404
+
+*** By this calculation, Lexi should be ranked #1.  Could it be the DR has a rounding error?  If I increase the "Performance" rating another tenth of a point to 8.81, Lexi "rightly" becomes the #1 choice.  The difference between Lexi and Judy is then .142
+
+By the following calculation, Bill should be the #1 choice, but he is listed 4th in the DR table:
+
+Lexi: 8.8 / 3.54 / 10 / 4.23 / 10 =	7.314
+Phil: 6.05 / 10 / 7.6 / 5.58 / 5.6 = 	6.966
+Judy: 7.8 / 5.44 / 5.35 / 9.55 / 7.73 = 7.174
+Bill: 3.63 / 5.50 / 10 / 10 / 10 = 	7.826 
+Sam: 5.52 / 5.79 / 9.8 / 3.2 / 10 =	6.862
+
+By straight averages, this list should be: Bill, Lexi, Judy, Phil, Sam, leading me to believe there's another dimension of weighting here.  To corroborate that, if I increase Bill's "Performance" from 3.63 to 3.67 (a difference of just .04), he goes from #4 to #1.  Is there more to the algorithm here, or is this a bug?
+
+BUGS
+-----------------------------------------------
+#N/A
+
+ISSUES
+-----------------------------------------------
+#ISSUE 1
+To show this report to anyone to "drive consensus" would be embarassing to the user.  It's written clearly in program-ese and would need a lot of work to be edited.  Legal reasons of using a program to make decisions?
+
+#ISSUE 2
+May be a floating point rounding error?  See above notes on why Lexi should be ranked #1 and she isn't.  The results are very close. This means the "wrong" decision might be made.
+
+#ISSUE 3
+Can this be made more testable with log files -- seeing the exact numeric of how each option is evaluated?

@@ -1,0 +1,75 @@
+CHARTER
+-----------------------------------------------
+Use the heuristic test design model to devise a DecideRight test strategy.
+
+#AREAS	
+OS | Win98
+Build | 1.2
+Strategy | Exploration & Analysis
+
+START
+-----------------------------------------------
+4/16/01 9:30am
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+normal
+
+#TEST DESIGN AND EXECUTION
+80
+
+#BUG INVESTIGATION AND REPORTING
+0
+
+#SESSION SETUP
+20
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+#N/A
+
+TEST NOTES
+-----------------------------------------------
+The major purpose of DecideRight is to help make difficult, high-stakes decisions. Therefore, our primary concern in testing it is to evaluate the correctness of decisions that it suggests, and the ability of users to properly operate the product to obtain those decisions. Although we will focus the bulk of our effort on those risk areas, we will also spend some time testing the general functionality of the product.
+
+Test strategy:
+
+   * Understand the decision algorithm and generate a parallel decision analyzer using Perl or Excel that will function as a reference oracle for high volume testing of the app.
+
+   * Create a means to generate and apply large numbers of decision scenarios to the product. This will be done either through the use of a GUI test automation system, if practical, or through a special test facility built into the product (if development is able to provide that), or through the direct generation of DecideRight scenario files that would be loaded into the product during test.
+
+   * Review the documentation, and the design of the user interface and functionality for its sensitivity to user error that could result in a reasonable misunderstanding of decision parameters, analysis, or suggestions. 
+
+   * Test with decision scenarios that are near the limit of complexity allowed by the product. (We will investigate creating these scenarios automatically.)
+
+   * Compare complex scenarios (Automatically, if practical).
+
+   * Test the product for the risk of silent failures or corruptions in the decision analysis.
+
+   * Using requirements documentation, user documentation, or by exploring the product, we will create an outline of product elements and use that to guide user-level capability and reliability testing of the product.
+
+
+
+BUGS
+-----------------------------------------------
+#N/A
+
+ISSUES
+-----------------------------------------------
+#ISSUE
+The decision algorithm is difficult to understand and simulate.
+
+#ISSUE
+Risk of coincidental failure of both the simulation and the product.
+
+#ISSUE
+Automating decision tests will be difficult.

@@ -1,0 +1,197 @@
+CHARTER
+-----------------------------------------------
+Verify the "What's new" claims made in the DecideRight User's Guide (page 1-4).
+
+#AREAS	
+OS | Win98
+Build | 1.2
+Strategy | Claims Testing
+DecideRight | Documents window
+DecideRight | OLE 
+DecideRight | QuickBuild
+
+START
+-----------------------------------------------
+4/17/01 9:30am
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+Tim Parkman
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+long
+
+#TEST DESIGN AND EXECUTION
+30
+
+#BUG INVESTIGATION AND REPORTING
+40
+
+#SESSION SETUP
+30
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+decision1.rtf
+apple.gif
+
+TEST NOTES
+-----------------------------------------------
+The 30% setup time above is because of the time we took to look at previous session reports and going through QuickBuild to create a "decision" on which to base our claims testing.
+
+Setup activity:
+
+  * created "decision" to have artifact data to use to verify claims (decision1.rtf)
+  * "decision" created: "Should I become a software tester?"
+  * spent 30 minutes stepping through QuickBuild to make a "decision" (see BUGs 1-5 below)
+
+SUMMARY
+
+7 claims were identified, these were the results:
+
+	#1: PARTIAL PASS -- Need Win 3.1 to test this
+ 	#2: PASS
+	#3: PARTIAL PASS
+	#4: FAIL
+	#5: PASS
+	#6: UNTESTED
+	#7: UNTESTED
+
+DETAILS
+
+1 -- "You can now link or embed scraps or objects from Win95 apps into the OLE documents pane of the documents window, which replaces the document's dialog box..."
+
+* "Edit OLE Document" menu -- embedded an object
+??? unsure about what "replaces the document's dialog box..." means - is it for dialog boxes from an earlier verion?
+	
+Result: PARTIAL PASS -- Need Win 3.1 to test this
+
+2 -- "Drag and drop files into the document window's Document References pane."
+
+* created / modified / deleted OLE object in Documents pane
+* dragged and dropped an image file into the Documents pane
+(Claim verified, but found related problem. See BUG 7)	
+
+Result: PASS
+
+3 -- "Send DecideRight files over Microsoft Exchange"
+
+* sent using Microsoft Outlook Express rather than Microsoft Exchange (see issue 2), received in email using Outlook
+
+Result: PARTIAL PASS
+
+4 -- "Send report files directly to your word processor"
+
+* sent our new "decision" directly to word processor.
+* prompted us to save as an RTF, then launched Wordpad after we clicked OK
+??? how do we specify a different word processor?
+* sent it to PowerPoint 4.0 -- nothing happened (see BUG 6)
+
+Result: FAIL
+
+5 -- "Tool tips for toolbar button"
+
+* moused over each of the toolbar buttons, verified tooltips
+
+Result: PASS
+
+6 -- "Disable automatic recalculation"
+
+??? we're not sure what this does, even after reading the manual. All it seems to do is minimize the main table window.  We need to revisit this later.
+
+Result: UNTESTED
+
+7 -- "Works with NT 3.51"
+
+(See ISSUE 1.)
+
+Result: UNTESTED
+
+BUGS
+-----------------------------------------------
+#BUG 1
+File | New = "Do you want to do a QuickBuild on the new table?"
+
+Why ask the user this when File | New would automatically launch QuickBuild so they can start a new decision?	
+
+#BUG 2 Enhancement Request
+QuickBuild: Option data is moved and uneditable when advancing from Options to Criteria then back again
+
+Repro:
+1 -- QuickBuild | make a new decision | Next
+2 -- type a list of Options | Next
+3 -- click Back
+
+Result: The entry field for Options is blank and the data has moved to the Options section of the main window, so the user can't readily or apparently edit them.
+
+#BUG 3
+QuickBuild: Two missing tab stops for Relative Importance page
+
+Repro:
+1 -- QuickBuild | make a new decision | Next
+2 -- type a list of Options | Next
+3 -- list criteria | Next
+4 -- tab through the controls until you reach Help button
+5 -- Tab again, and once more
+
+Result: There is no visible tab stop for these last two tabs. 
+
+#BUG 4
+QuickBuild: slider on Weigh Criteria page does not go all the way to Low when Low button is clicked.
+
+1 -- QuickBuild | make a new decision | Next
+2 -- type a list of Options | Next
+3 -- list criteria | Next
+4 -- click the Low button
+
+Result: slider is not place on the very right edge of the Low section.  This is inconsistent with the High Button, which places it on the left edge of High.  It's also inconsistent with the Rate Options slider which places the arrow in the middle of each section when buttons are clicked.
+
+#BUG 5
+QuickBuild: The criteria title region is not long enough to state the full text input
+
+Repro:
+1 -- QuickBuild | make a new decision | Next
+2 -- type a long Option (40 characters)
+3 -- type another long Option of the same 40 characters, but add a few different characters to the end of those 40
+4 -- click Next 
+5 -- proceed to the Rate Option window
+
+Result: You are prompted to rate each criteria, but you can't tell them apart.
+
+#BUG 6
+Attempting to send report to any report format does not send it anywhere
+
+Repro:
+1 -- create or open a decision
+2 -- click the Reports toolbar button
+3 -- select any item (i.e. "PowerPoint 4.0 Presentation")
+
+Result: You are prompted to save as an RTF, but nothing happens after that.
+
+#BUG 7
+Drag-and-drop of file into Optional Description window leads to cryptic error message and endless hourglass on blank Optional Description page
+
+Repro:
+1 -- open a decision
+2 -- double-click an option to open it (Optional Description window opens)
+3 -- click and drag a document from the desktop to the Optional Description window
+
+Result: dialog box "Cannot Read This Verison" which does not have focus (title bar is gray). Click on the Optional Description window instead of the dialog. Hourglass stays indefinitely -- not sure what's going on.  If you click to the "Cannot Read This Version" dialog, then a blank Decision window appears.
+
+ISSUES
+-----------------------------------------------
+#ISSUE 1
+We don't have Win 3.1 or NT 3.51 machines, so we can't yet verify the claim that it runs on that platform or converts the OLE object.
+
+#ISSUE 2
+We need Microsoft Exchange to test claim #3.  Though we did use Hotmail and MS Outlook and it worked.
+
+#ISSUE 3
+In a separate session, revisit claim #6: "Disable automatic recalculation".  I need more time to figure out what this does.

@@ -1,0 +1,10 @@
+Risk list for DecideRight:
+
+* It will suggest the wrong decisions.
+* People will use the product incorrectly.
+* It will incorrectly compare scenarios.
+* Scenarios may become corrupted.
+* It will not be able to handle complex decisions.
+
+
+

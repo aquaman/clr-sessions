@@ -1,0 +1,151 @@
+CHARTER
+-----------------------------------------------
+Explore a decision created with QuickBuild -- the wizard that guides the user through the options, criteria, and weights needed to calculate the best decision. 
+
+#AREAS	
+OS | Win98
+Build | 1.2
+DecideRight | QuickBuild
+DecideRight | Report Generator
+Strategy | Exploration & Analysis
+
+START
+-----------------------------------------------
+4/17/01 1:30pm
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+short
+
+#TEST DESIGN AND EXECUTION
+70
+
+#BUG INVESTIGATION AND REPORTING
+20
+
+#SESSION SETUP
+10
+
+#CHARTER VS. OPPORTUNITY
+90/10
+
+DATA FILES
+-----------------------------------------------
+food.drd
+food.rtf
+food2.rtf
+food3.rtf
+
+TEST NOTES
+-----------------------------------------------
+
+Created a new "decision" that I already knew the answer to: What kind of food to have for dinner?  I wanted to see if DecideRight could reach the same conclusion.
+
+Options:
+  * American
+  * Chinese
+  * Mexican
+  * Italian
+  * Pizza
+  * Nothing
+
+Criteria:
+  * price
+  * taste
+  * convenience
+  * last had
+  * health	
+
+Report notes:
+
+FOOD.RTF
+
+  "Nothing" appears to be the best choice even though my answer was "Pizza."  
+
+  ??? How did it reach this calculation?  I would like to devote a session to this.	
+  ??? what's the difference between N/A and ??? values
+  (see BUG 1 below)
+
+FOOD2.RTF 
+
+  * DecideRight showed my 6 choices (options) in order of importance but does not describe why it ranked them (see BUG below)
+  * DecideRight did show my criteria ranked in order, however
+
+FOOD3.RTF
+
+  Created this file because I had a test idea: add some new criteria options to an existing decision table and re-run the report.
+
+	Result: PASS -- changes get reflected and recalc'ed
+
+	Found a problem in the formatting, though (see BUG 3)
+
+  Test Idea: does eliminating unknown values remove the disclaimer at the top of the report: ("Warning!  Some elements in the decision table which generated this report are labeled "To Be Rated" or "Unknown," and it may therefore be premature to draw conclusions from the data.")  
+
+	Result: PASS -- the disclaimer was removed.
+
+
+OPPORTUNITY: Noticed that pushpin icon on toolbar for decision table does nothing when no option is highlighted. (see BUG 4 below)	
+
+Session interrupted by phone call.  Will pick this up in other session tomorrow.
+
+Conclusions: I'd like another session or two to learn the algorithm DecideRight uses to make decisions.  Then I can verify that the report is accurate.
+
+
+BUGS
+-----------------------------------------------
+#BUG 1
+Not dragging the weight slider for a criteria item leads to an ??? instead of max "Poor"
+
+Repro:
+1 -- launch QuickBuild to create a new decision
+2 -- put in some options | Next
+3 -- put in some criteria | Next
+4 -- when weighing the criteria move on to the Rate Options portion
+5 -- don't move the slider for one of the options
+6 -- run the report
+
+Result:  Graph shows that value as being ??? instead of "Poor".   Since the default position of the rating slider is at the end of the Poor scale, I assumed it would be logged as a maximum "Poor" value, not "unknown".
+
+#BUG 2
+Report is missing descriptor for Option section
+
+Repro:
+1 -- create a decision using QuickBuild
+2 -- File | Generate Report
+
+Result:  The preamble to the list of ranked choices is missed a descriptor that tells in which order they were ranked.  In the criteria section of the report, it tells the order: ("The criteria used to evaluate the options were (in order of importance))."
+
+#BUG 3
+Graph labels (y-axis) are cut of if they are longer than 20 characters
+
+Repro:
+1 -- create a decision with options that are over 20 characters
+2 -- run through QuickBuild with all the defaults
+3 -- File | Generate Report
+
+Result: The y-axis labels are truncated.
+
+#BUG 4 OPPORTUNITY
+Pushpin toolbar button ("View/edit explanatory text for a decision element") doesn othing if no option is selected in the decision table
+
+Repro:
+1 -- launch a decision table
+2 -- click the pushpin icon
+
+Result: No response.
+
+Expected:  Would be helpful if a dialog that tells me I have to select an option first.
+
+ISSUES
+-----------------------------------------------
+#ISSUE 1
+I'd like another session or two to learn the algorithm DecideRight uses to make decisions.  Then I can verify that the report is accurate.
+
+#ISSUE 2
+What's the difference between N/A and ??? values ?

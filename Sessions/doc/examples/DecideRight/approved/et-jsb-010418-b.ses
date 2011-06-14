@@ -1,0 +1,149 @@
+CHARTER
+-----------------------------------------------
+Start DecideRight as if using right out of the box to quickly make a decision, testing the claim that you can create a decision within 5 - 10 minutes.
+
+#AREAS	
+OS | Win98
+Build | 1.2
+DecideRight | Main Table window
+Strategy | Complex | Flow Testing
+
+START
+-----------------------------------------------
+4/18/01 1:00pm
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+normal
+
+#TEST DESIGN AND EXECUTION
+30
+
+#BUG INVESTIGATION AND REPORTING
+60
+
+#SESSION SETUP
+10
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+flow.drd
+flow.rtf
+flow2.rtf
+basic.rtf
+basic.drd
+
+TEST NOTES
+-----------------------------------------------
+Launched DR and went right into QuickBuild to make a decision on whether to build or acquire an R&D lab. Followed the flow of my thinking, doing one thing after another, pausing only to note bugs and start the flow over.
+
+  * Listed criteria and options (found BUG 1 below)
+
+  * Looked at main table window (BUG 2 below)
+
+  * Proceeded through QB, clicking defaults until generate report and noticed the options listed in the main table window are also cut off  (BUG 3 below)
+
+  * Clicked Main table toolbar button, Weights button, paper clip toolbar button ("view/edit documents that expain a decision element"), pushpin icon  (see BUG 4 below)
+
+  * Started with File / New to create new table -- clicked No when prompted to "Do a QuickBuild on the new table" I wanted to see how to add an option and criterion, but it's not clear what to do to add another (see BUG 5 below)
+
+At this point, I noticed I had 10 open decisions.  This should be a stress test for a later session.  Closed them all and started fresh flow.
+
+  * Started new decision table, 4 options, 4 crtieria, rated Excellent to Poor
+walked through each menu, selected the contents, looking for confusing flow:
+
+File / New / add options / add criteria / help / save / close
+File / New / add options / add criteria / help / save / print / close
+File / Open / add options / add criteria / help / save / close
+File / Open / add options / add criteria / help / save / print / close
+Table / Weights / Ratings / Report / Graph / Advisor / Table
+all toolbar buttons: Save / cut / copy / paste / up option / down option / left criterion/ right criterion / view edit docs / sensitivity
+
+Most of this session was bug investigation and reporting.
+
+BUGS
+-----------------------------------------------
+#BUG 1
+Rate options dialog only holds 37 characters for "rate the option" and "on the criterion"
+
+600X800 resolution
+
+Repro:
+1 -- QB
+2 -- list options and criteria that exceed 37 characters
+3 -- proceed to the "rate options" dialog
+Result:
+Notice that the text in the captions for "rate the option" and "on the criterion" is cut off after 37 characters
+
+#BUG 2
+Option text is cut off after 35 characters  in window next to main table window
+
+600X800 resolution
+
+Repro:
+1 -- QB
+2 -- list options and criteria that exceed 25 characters
+3 -- proceed to the "rate options" dialog
+4 -- look up to the Overlap control window to the right of the main table
+Result: 
+Text is cut off after 25 characters
+
+#BUG 3
+Option text on right side of main table window is cut off after 35 characters
+
+600X800 resolution
+Repro:
+1 -- QB
+2 -- list options and criteria that exceed 25 characters
+3 -- proceed to the "rate options" dialog
+4 -- look up to the Options (Y axis) window to the left of the main table
+Result: 
+Text is cut off after 35 characters.
+
+#BUG 4
+Paper clip, pushpin, arrow toolbar buttons are not functional on Weights window
+Repro:
+1 -- after a decision is made, click the Table button on the toolbar
+2 -- click the Weights button
+3 -- click the paper clip / pushpin / or arrow buttons
+Result:
+Nothing happens.
+
+#BUG 5
+Not intuitive how to add a second option or crtierion when not using QB
+Repro:
+1 -- File menu / New
+2 -- click No to the prompt to using QB
+3 -- click the "Click to Add Option" button on the right side of the table
+4 -- type a new option in the "Type New Option Here" field
+5 -- ENTER
+6 -- click the option you just made
+Result:
+How does the user create a second option?  There is nothing in the manual about this. The same is true for adding criterion
+
+#BUG 6
+Text field is unresponsive, so should be grayed out
+Repro:
+1 -- FIle menu / New
+2 -- click No to the prompt to using QB
+3 -- click the question marked cell in the table
+4 -- click the text field to the right of the toolbar
+Result:
+Although the cursor blinks in this field, nothing can be typed.  It is not meant for user input, so it should be grayed.
+
+ISSUES
+-----------------------------------------------
+#ISSUE 1
+Need to test at different screen resolutions.
+
+#ISSUE 2
+Stress test idea: How many open decisions can you have?

@@ -1,0 +1,113 @@
+CHARTER
+-----------------------------------------------
+Create a test coverage outline and risk list for DecideRight.
+
+#AREAS
+DecideRight
+OS | Win98
+Build | 1.2
+Strategy | Exploration & Analysis
+
+START
+-----------------------------------------------
+4/16/01 1:00pm
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+Tim Parkman
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+short
+
+#TEST DESIGN AND EXECUTION
+100
+
+#BUG INVESTIGATION AND REPORTING
+0
+
+#SESSION SETUP
+0
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+tco-jsb-010416-a.txt
+rl-jsb-010416-a.txt
+
+TEST NOTES
+-----------------------------------------------
+Tim and I walked through the User Guide table of contents and index to create the following TCO:
+
+Operating Systems:
+
+	Win98
+	Win2000
+
+General Features:
+	
+	Installation
+	User Manual
+	Online Help
+	UI
+	Preferences
+
+Prominent Windows:
+
+	Main Table window
+	Criteria Weights window
+	Option Ratings window
+	Documents window
+	Start-up window
+
+Managers and Wizards:
+
+	DecideRight Advisor
+	Category Label Editor
+	Numeric Editor
+	Scenario Manager
+	Report Generator
+	QuickBuild
+
+Decision Elements:
+
+	Language Elements
+	Preferences
+	Sensitivity Indicators
+	Weighting
+	Input Options
+	Decision Table
+	Options Ratings
+	Baseline
+
+Interoperability:
+
+	OLE 
+	Import / Export
+	Graphs
+	Printing
+
+Risk list for DecideRight:
+
+* It will suggest the wrong decisions.
+* People will use the product incorrectly.
+* It will incorrectly compare scenarios.
+* Scenarios may become corrupted.
+* It will not be able to handle complex decisions.
+
+BUGS
+-----------------------------------------------
+#N/A
+
+ISSUES
+-----------------------------------------------
+#ISSUE
+Manual mentions different platforms (Win 3.1, WFW, and WinNT 3.51) and does not mention Win2000. We think Win 2000 is important to test on and that the older OSes are no longer meaningful. 
+
+#ISSUE
+We did this analysis on Win98.  I have no data to suggest that features may be different on other operating systems, but I'm not sure about that.

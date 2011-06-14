@@ -1,0 +1,122 @@
+CHARTER
+-----------------------------------------------
+Stress QuickBuild criteria and options.
+
+#AREAS	
+OS | Win98
+Build | 1.2
+DecideRight | QuickBuild
+DecideRight | Main Table window
+Strategy | Complex | Stress Testing
+
+START
+-----------------------------------------------
+4/18/01 9:30am
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+normal
+
+#TEST DESIGN AND EXECUTION
+20
+
+#BUG INVESTIGATION AND REPORTING
+60
+
+#SESSION SETUP
+20
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+stress.drd
+stress75.drd
+
+
+TEST NOTES
+-----------------------------------------------
+Entered 20,000 characters in options then criteria section of QuickBuild. (see BUG 1 below)  -- clicked all UI buttons while it appears to be calculating rows and columns -- every few seconds DR would come back and allow a mouse click to be processed, then returns to its calculations
+
+Clicked toolbar buttons after opening DR (see BUG 2 below)
+
+list options 1 -10, w/ criteria (see BUG 3 below)
+
+list options 1- 100, w/ criteria (see BUG 4 below)
+
+DR crashed, when relaunched, error msg from Windows: not enoguh memory.  The only other thing open was notepad!  Suspect a memory leak.
+
+When to save notepad file (test input data of numbers) and the save as dialog, went blank when toggling to another notepad, could not recover -- had to shut down!
+
+Did a 50 X 50 table and it did not crash (stress.drd)
+Printed the report (see BUG 5)
+
+Did a 75 X 75 table (stress75.drd)
+(see BUG 6)
+
+Most of this session was spent investigating and reproing the crashes.
+
+BUGS
+-----------------------------------------------
+#BUG 1
+No hourglass with long names
+1 -- QB
+2 -- Enter 20000 characters in options
+3 -- Enter 20000 characters in criteria
+4 -- Next on "weight criteria" window
+Result:
+No hourglass while it calculates table, app is unresponsive
+
+#BUG 2
+Buttons should be grayed if not active
+1 -- launch DR and do a QB
+2 -- close all QB and DR windows
+3 -- click the buttons on the toolbar
+Result:
+They can be clicked, but nothing happens.
+
+#BUG 3
+Options are listed by ordinal, not numeric
+1 -- launch QB
+2 -- in options list, list the numbers 1- 10 (a number on each line)
+3 -- do the same for criteria
+4 -- finish
+Result:
+The numbers for options are listed by ordinal not numeric, so they are listed 1, 10, 11, 12 ...
+
+#BUG 4 
+GPF when doing 100 X 100 options X criteria
+1 -- QB
+2 -- list the numbers 1- 100, a carriage return after each number for options
+3 -- do the same for criteria
+4 -- finish
+Result: After 30 seconds of the table populating, DR crashes with a GPF in decider.exe in module 0016:0000082f
+
+#BUG 5
+Only 8 colors in report legend, which are re-used
+Repro:
+1 -- make a table with 10 options and 10 criteria
+2 -- weight each and print a report
+Result: 
+Notice that in the "Comaprisons Among Choices" graph the legend colors are reused since there are more than 8 
+
+#BUG 6 
+GPF in decider.exe after creating 75X75 table
+Repro:
+1 -- QB
+2 -- Options 1 - 75 (numbers only)
+3 -- Criteria 1 - 75
+4 -- FInish
+Result:
+While populating the table, an error message: "Warning: Runtime error: the parameter is incorrect (OS error 16r57) (see error.log for more information) -- clicked OK, then got a 32-bit GPF in decider module VVM31W.DLL at 017f:1003804f"  clicked Ok to dismiss the error and *exevy open app* gets dismissed.  Start menu can be opened but no response, no response to opening any other app.  Shut Down non-resposive, have to hard restart.
+
+ISSUES
+-----------------------------------------------
+#N/A

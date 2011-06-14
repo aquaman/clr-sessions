@@ -1,0 +1,162 @@
+CHARTER
+-----------------------------------------------
+Using the steps outlined in the manual, create a decision table manually noting any significant differences than when using QuickBuild.
+
+#AREAS	
+OS | Win98
+Build | 1.2
+DecideRight | Main Table window
+Strategy | Complex | Stress Testing
+Strategy | Complex | Function & Data Testing
+
+START
+-----------------------------------------------
+4/17/01 5:30pm
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+Tim Parkman
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+normal
+
+#TEST DESIGN AND EXECUTION
+50
+
+#BUG INVESTIGATION AND REPORTING
+30
+
+#SESSION SETUP
+20
+
+#CHARTER VS. OPPORTUNITY
+90/10
+
+DATA FILES
+-----------------------------------------------
+Thursday.drd
+
+TEST NOTES
+-----------------------------------------------
+Stepped through the steps in the manual, starting on page 5-1 to walk through a new decision table -- ended on page 5-6
+
+  * Clicked toolbar buttons (see BUG 1)
+  * added options and criteria w / weighting (see BUG 8)
+  * added options that were non-alphenumeric characters
+  * tested Optional Overview field -- 32000 characters entered
+  * Edit menu: Add Option (see BUG 2) (via menu and clicking.  Tested how many options you can list and alphabetizing (see BUG 3 and 7)
+??? Manual says that I can return to the table by "clicking any other table element."  Not sure what this means.
+  * Entered a description for an option 
+  * Changed the name of an existing option
+  * Added a new option (see BUG 4 and 5)
+  * Verified a option can be deleted with right-click menu or edit menu
+??? Should Undo work after deleting an option?  It doesn't. (see ISSUE 2)
+  * Added 63 columns of criteria -- (see BUG 6 & ISSUE 1)
+
+OPPORTUNITY: tested Find/Replace on option description (DCR about no Replace button -- UI shows a confirm instead) -- spent about 10 minutes testing the max length of the description field
+
+After creating a table using the steps in the manual, I didn't see any important differences from using QuickBuild.
+
+BUGS
+-----------------------------------------------
+#BUG 1
+UI: paper clip and pushpin buttons are not disabled, even though they do nothing
+
+Repro:
+1 -- create a new decision manually
+2 -- click either paper clip or pushpin button (fly out text says "view/edit documents that explain a decision element"
+
+Result: No response.
+
+Expected: Should be grayed out, else to perform the function that the flyout menu claims should be performed.
+
+#BUG 2
+No accelerator keys for some menu items
+
+Repro:
+The following menu items do not have underbars:
+	File | Preferences
+	Edit | Add Option
+	Edit | Add Criterion
+	Edit | Delete Option	
+	Edit | Delete Criterion
+	Edit | Find/Replace
+	Edit | Numeric Values
+	Edit | Optional Epxlanation
+	Edit | Documents	
+	View | Ratings Graph
+	View | Baseline Comparison Graph
+	View | Previous Criterion
+	View | Next Criterion
+	View | Previous Option
+	View | Next Option
+	Format | Recalc Disable (Minimize Table)
+	
+#BUG 3 
+Decision table lets you have options and criteria that are identically named
+
+Repro:
+1 -- Make a decision table manually
+2 -- add two criteria and options with the same name
+
+Result: no warning that there is a duplicate
+Expected: No duplicates to be allowed, because of potential confusion to user
+
+#BUG 4 
+When focus is on Option list in table, there is no arrow key support to scroll through list
+
+Repro:
+1 -- make a new decision table
+2 -- highlight an option
+3 -- press the up or down arrows
+
+Result: No response.
+Expected: Arrow keys should be active to scroll through the list of options.
+
+
+#BUG 5
+Data can't be entered in entry box for new option when focus is on table
+
+Repro:
+1 -- In the option view, click on the table
+2 -- click on the insertion point
+3 -- type something
+
+Result: There is an insertion-point cursor, but keyboard is unresponsive. 
+
+#BUG 6 
+Crash -- GPF in DECIDER.EXE (crash in GDI.EXE in module 00016:000007f1 when entering over 60 columns of criteria
+
+Repro:
+1 -- create a new decision table (manually)
+2 -- add criteria by typing in a name and hitting ENTER
+3 -- repeat approx. 60 columns
+
+Result: GPF in GDI.EXE.  When you try to launch DecideRight again, dialog pops up -- "not enough free memory" even though there is no other app open.
+
+#BUG 7
+New option added to existing options does not get sorted alphabetically
+
+Repro:
+1 -- create a new decision table
+2 -- add 5 or 6 options
+3 -- add some criteria
+4 -- go back and add another option
+
+Result: The new additional option does not get alphabetically sorted like the others until the table is closed and re-opened.
+
+#BUG 8
+Identical options can be entered
+
+
+ISSUES
+-----------------------------------------------
+#ISSUE 1
+Is there a recommended maximum number of criteria?  We were getting GPFs with about 60 columns.
+
+#ISSUE 2
+Should Undo work after deleting an option?  It doesn't.

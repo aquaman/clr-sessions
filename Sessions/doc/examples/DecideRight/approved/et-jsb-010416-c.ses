@@ -1,0 +1,181 @@
+CHARTER
+-----------------------------------------------
+Develop a model of the product by creating ideas for future charters.  Also list the primary functions -- any function so important that, in the estimation of a normal user, its inoperability or impairment would render the product unfit for its purpose.
+
+#AREAS	
+OS | Win98
+Build | 1.2
+Strategy | Exploration & Analysis
+
+START
+-----------------------------------------------
+4/16/01 2:30pm
+
+TESTER
+-----------------------------------------------
+Jonathan Bach
+Tim Parkman
+
+TASK BREAKDOWN
+-----------------------------------------------
+
+#DURATION
+normal
+
+#TEST DESIGN AND EXECUTION
+90
+
+#BUG INVESTIGATION AND REPORTING
+0
+
+#SESSION SETUP
+10
+
+#CHARTER VS. OPPORTUNITY
+100/0
+
+DATA FILES
+-----------------------------------------------
+dr-charters.txt
+
+TEST NOTES
+-----------------------------------------------
+
+* Installed DecideRight on Win98 from diskette
+
+* Tim and I browsed the UI, listing the functions of each menu
+
+(P)  =  primary function (function that, if broken, would render the product unfit for its purpose.)
+
+File menu:
+	New 			(P)
+	Open			
+	Close	
+	QuickBuild 	
+	Save			(P)
+	Save As...		
+	Print			
+	Generate Report...	(P)
+	Export DecideRight 1.0...	
+	Export Image...
+	Import...			
+	Send...
+	Preferences
+	Exit
+
+Edit menu:
+	Undo
+	Cut
+	Copy
+	Copy Image
+	Paste
+	Select All
+	Delete Option		(P)
+	Delete Criterion	(P)	
+	Add Option		(P)	
+	Add Criterion		(P)
+	Find/Replace...
+	Numeric Values...	(P)
+	Optional Explanation...	(P)
+	(Optional Description...)(P)
+	Documents...		(P)
+
+View menu:
+	Decision Table		(P)
+	Criteria Weights	(P)
+	Option Ratings		(P)
+	Baseline		(P)		
+	Ratings Graph		
+	Baseline Comparison Graph
+	Previous Criterion
+	Next Criterion
+	Previous Option
+	Next Option
+
+Format menu:
+	Display Zoom
+	Sensitivity Indicators	(P)
+	Show Column As
+	Category Labels...
+	Recalc Disable
+	Font...
+	Colors...
+
+Scenarios menu:
+	Add to Scenario...	(P)
+	Manage Scenario...	(P)
+	Update Baseline Element	
+	Track Baseline Element
+	Update Baseline and Track
+
+Window & Help menus
+Startup Wizard
+
+With manual-in-hand, Tim and I drilled down into these primary functions above to create ideas for future exploration.  These ideas are saved in a datfile titled dr-charters.txt.
+
+1 -- QuickBuild is the decision "wizard" in DecideRight.  Run through QB for a decision and verify that the decision returned reflects the proper weighting that was given.
+
+2 -- Create a decision with about 5 options and 5 criteria, but don't use QuickBuild -- instead use the Table Window.  
+
+3 -- Stress testing: find the maximum limit of options and criteria for a decision table.
+
+4 -- Verify claims made in Chapter 1 of the user manual ("DecideRight's Key Benefits").
+
+5 -- Scenario Manager: use it to change elements of a decision table, criteria importance, ratings of options, and supported text.  Attempt to add an option or criteria to a scenario table that does not exist in the baseline
+
+6 -- Report Generator / Printing: check the reports created by decision tables for formatting problems, either on screen or in print-outs.
+
+7 -- Install on each of the supported operating systems.  
+
+8 -- Risk testing:  create decision tables and examine the decision results based on these different levels of risk: 	
+	High -- whether to fire somebody
+	High -- whether to invest company profits in the stock market
+	High -- whether to merge with another company
+	Medium -- whether to move to another state for a new job
+	Medium -- whether to give the secretary a raise
+	Medium -- whether to upgrade computers with more memory
+	Low -- where to eat today for the staff meeting
+	Low -- where to have the company picnic
+	Low -- whether to screen incoming calls with caller ID
+
+9 -- Criteria Weights window: add / modify / change criteria and see how it affects the decision results.  
+
+10 -- Criteria weights: change category labels and scale maximum.  Assign numeric values for each weight. (can you assign negative numbers, decimals, etc.?)
+
+11 -- Baseline:view / update the baseline for a decision.
+
+12 -- Option Ratings: There are 11 option ratings categories.  A numeric value may be assigned for each.   Change option ratings for a decision and verify the change makes sense.
+
+13 -- Export a decision table to several different Office apps (Word, Excel, PPT).
+ 	
+14 -- Collaboration / group decision-making via a scenario -- the CFO wants to buy an expensive copier, the lab manager believes it should be leased.  From two computers, access the same decision file to add or update the decision criteria.
+
+15 -- OLE: attach a variety of external documents to a decision table.
+
+16 -- Modify the sensitivity indicators for a new or existing decision.  
+
+17 -- Startup: walk through the options in the Start-up window
+
+18 -- Advisor: this is the online help -- verify links and table of contents reflects every major topic in the user guide.
+
+19 -- Import: using the format sample "ingarage.txt", explore the import function for other text files you create using this format.
+
+20 -- Verify the "What's new" claims made in the DecideRight User's Guide (page 1-4).
+
+21 -- Take an initial pass through a decision report created with QuickBuild -- the wizard that guides the user through the options, criteria, and weights needed to calculate the best decision. 
+
+BUGS
+-----------------------------------------------
+#BUG
+The icon for DecideRight in the ALT-tab window is a windows default, not the DecideRight logo.
+
+Repro:
+1 -- launch DecideRight, launch Notepad, launch explorer
+2 -- ALT-tab
+
+Result: Logo for DecideRight is not correct.
+
+ISSUES
+-----------------------------------------------
+#ISSUE
+This session will be an important reference, so I made a separate datafile containing the charter ideas.  It should be placed in TODO folder to create other sessions.
