@@ -18,7 +18,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 09 June 2011
+# Last Updated:: 13 June 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
@@ -583,11 +583,11 @@ def parse_breakdown( num_testers )
       if ( ! cvo_content_found )
         cvo_content_found = true
         
-        if ( line !~ /^\d+\s*\/\s*\d+/ )
+        if ( line !~ /^\d+\s*(\W)\s*\d+/ )
           error("Unexpected #CHARTER VS. OPPORTUNITY value \"#{line}\" in TASK BREAKDOWN section. Ensure that the values are integers from 0-100 separated by '/'.")
         end
         
-        (cha_val, opp_val) = line.split('/')
+        (cha_val, opp_val) = line.split($1)
         
         if cha_val.nil?
           cha_val = '0'
