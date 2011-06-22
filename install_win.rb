@@ -1,5 +1,5 @@
 #
-# configure.rb - Run Me First on Windows!!!
+# install_win.rb - Run Me First on Windows!!!
 #
 # 1. check to make sure this is a Windows system. If not, stop
 # 2. collect list of files in sub-directories
@@ -43,7 +43,7 @@ end
 ## 4) rewrite all files that have had the line endings set to LF:
 
 filez.delete_if {|filename| filename !~ /\.rb|\.txt|\.bat|\.ini|\.yml|\.tpl|\.htm|\.ses|\.drd/i }
-filez.delete('configure.rb')   # (let's not overwrite the script that is running!)
+filez.delete( File.basename($0) )   # (let's not overwrite the script that is running!)
 
 def rewrite( filename )
   timez = []
