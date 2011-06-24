@@ -11,7 +11,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 15 June 2011
+# Last Updated:: 23 June 2011
 # -----
 
 ### NOTES ###
@@ -121,6 +121,7 @@ mainbody << "CHARTER\n"
 mainbody << dashedline + "\n"
 mainbody << "\n#LTTD_AREA\n\n" if @include_switch['LTTD']
 mainbody << "\n#AREAS\n\n" if @include_switch['Areas']
+mainbody << "\n#BUILD\n\n" if @include_switch['Build']
 mainbody << "\nSTART\n"
 mainbody << dashedline
 

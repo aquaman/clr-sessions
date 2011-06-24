@@ -8,8 +8,8 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 02 June 2011
-# Version:: 2.0
+# Last Updated:: 23 June 2011
+# Version:: 2.1
 # -----
 
 if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbtm.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
@@ -45,6 +45,7 @@ dashedline = '-' * 50 + "\n"
 linebreaks = "\n\n"
 mainbody = ''
 
+mainbody << "\n#BUILD\n\n" if @include_switch['Build']
 mainbody << "\nSTART\n"
 mainbody << dashedline + linebreaks
 mainbody << "TESTER\n"
