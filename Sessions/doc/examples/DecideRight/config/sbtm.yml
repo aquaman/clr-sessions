@@ -1,10 +1,15 @@
-# This is the configuration file for the Command-Line Ruby Session-Based Testing framework
-# Note: when editing this file, never use tabs for indenting - use spaces instead
+#
+# Configuration file for the Command-Line Ruby Session-Based Testing framework
+#
+# Note: when editing this file, never use tabs for indenting - only use spaces
+#
+
 
 # Set an option to 'true' if you include the section in your session sheets
 scan_options:
   LTTD:       false
   Areas:      true
+  Build:      false
   Duration:   true
   TBS:        true
   C vs O:     true
@@ -12,7 +17,8 @@ scan_options:
   Warnings:   false
 
 # Folders - specify absolute or relative paths
-# Relative paths start from the script run location - e.g. starting from c:\sessions
+# NOTE: If you use _relative_ paths, be sure to run the scripts from 
+#       the 'HOME' location - e.g. start from c:\sessions
 folders:
   data_dir:         datafiles
   metrics_dir:      reports
@@ -20,9 +26,15 @@ folders:
   report_templates: config/templates
   todo_dir:         todo
 
-# If you blank out the filename, output will be written to the console
+# NOTE 1: If you blank out the logfile name, the Scan Tool output
+#         will be written to the console
+# NOTE 2: Specify the date and time format you prefer to see in session sheets
+#         and HTML reports. REFERENCE: Look up Ruby Time "strftime" method
+# (There are different formatting options depending on your Ruby version!)
 output:
-  logfile: scan.log
+  logfile:     scan.log
+  date format: %m/%d/%Y    # NOTE: ALL team members must use the same format!
+  time format: %I:%M%p    # (print time in 12-hr format)
 
 # All times are specified in minutes
 timebox:
