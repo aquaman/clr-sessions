@@ -14,6 +14,7 @@ tester_ID:
 scan_options:
   LTTD:       false
   Areas:      true
+  Build:      false
   Duration:   true
   TBS:        true
   C vs O:     true
@@ -32,8 +33,14 @@ folders:
 
 # NOTE 1: If you blank out the logfile name, the Scan Tool output
 #         will be written to the console
+# NOTE 2: Specify the date and time format you prefer to see in session sheets
+#         and HTML reports. REFERENCE: Look up Ruby Time "strftime" method
+# (There are different formatting options depending on your Ruby version!)
 output:
   logfile:     scan.log
+  date format: %m/%d/%Y    # NOTE: ALL team members must use the same format!
+  time format: %I:%M %p    # (print time in 12-hr format)
+#  time format: %H:%M       # (print time in 24-hr format)
 
 # All times are specified in minutes
 timebox:
