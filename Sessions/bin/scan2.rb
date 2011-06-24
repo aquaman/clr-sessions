@@ -18,8 +18,8 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 13 June 2011
-# Version:: 2.0
+# Last Updated:: 23 June 2011
+# Version:: 2.1
 # -----
 @ScriptName = File.basename($0)
 
@@ -252,7 +252,8 @@ def parse_file
   error("Missing a TEST NOTES section") unless testnotes_found
   error("Missing a BUGS section") unless bugs_found
   error("Missing an ISSUES section") unless issues_found
-  warning("[Tab] character found in file.  Tabs may cause unexpected formatting in different editors.  Please convert Tabs to Spaces if possible.") if tab_char_found
+  warning("[Tab] character found in file.  Tabs may cause unexpected formatting in " +
+    "different editors.  Please convert Tabs to Spaces if possible.") if tab_char_found
 end
 
 ##
@@ -284,18 +285,21 @@ end
 #
 # This method performs different error checks depending on the _session_type_ -- which may be set to either "test" or "todo" depending on the type of sheet scanned.
 #
-# There are two optional sub-sections that may appear here:
+# There are three optional sub-sections that may appear here:
 # * ##LTTD_AREA
 # * ##AREAS
+# * ##BUILD
 # The sub-sections may be enabled in the SBTML.YML configuration file.
 #
 # Output:
 # * Charter text is immediately saved to file
+# * Build ID text, if present in the session sheet, is immediately saved to file
 #
 def parse_charter( session_type = 'test' )
   charter_complete = false ;  charter_desc = []
   lttd_found = false ;        lttd_area = []
   area_found = false ;        areas = []
+  build_found = false ;       build_info = []
   in_section = ''
   build_line_found = false
   strategy_line_found = false
@@ -305,6 +309,7 @@ def parse_charter( session_type = 'test' )
 
   @charter_contents.each do |line|
     
+    line.strip!
     if ( line =~ /^#AREAS/ and @include_switch['Areas'] )
       error('More than one #AREAS hashtag found in CHARTER section') if ( area_found )
       area_found = true
@@ -313,9 +318,14 @@ def parse_charter( session_type = 'test' )
       error('More than one #LTTD_AREA hashtag found in CHARTER section') if ( lttd_found )
       lttd_found = true
       in_section = 'LTTD'
+    elsif ( line =~ /^#BUILD/ and @include_switch['Build'] )
+      error('More than one #BUILD hashtag found in CHARTER section') if ( build_found )
+      build_found = true
+      in_section = 'BUILD'
     end
+    
     if ( ! charter_complete )
-      charter_desc << line unless ( line =~ /^#/ ) or ( lttd_found ) or ( area_found )
+      charter_desc << line unless ( line =~ /^#/ ) or ( lttd_found ) or ( area_found ) or ( build_found )
       
       if ( line =~ /^#/ )
         charter_complete = true
@@ -329,23 +339,25 @@ def parse_charter( session_type = 'test' )
         end
       end
       
-    elsif ( ! lttd_found ) and ( ! area_found ) and ( line !~ /^#/ )
-      error("Unexpected text \"#{line.chomp}\" found in CHARTER section. The charter description ends when '#' starts a new line. All other text in the CHARTER section must be preceded by a valid '#' hashtag.")
+    elsif ( ! lttd_found ) and ( ! area_found ) and ( ! build_found ) and ( line !~ /^#/ )
+      error("Unexpected text \"#{line.chomp}\" found in CHARTER section. The charter description ends " + 
+        "when '#' starts a new line. All other text in the CHARTER section must be preceded by a valid '#' hashtag.")
       
     end
     
+    next if line =~ /^#/
+    
     case in_section
     when 'LTTD'
-      next if line =~ /^#/
-      line.strip!.upcase!
+      line.upcase!
       if @LTTD_Areas.include?( line )
         lttd_area << line unless lttd_area.include?( line )     # (avoid duplicates)
       else
         error("Unexpected #LTTD_AREA label \"#{line}\" in CHARTER section. Ensure that label exists in LTTD_AREAS.INI.")
       end
+    
     when 'AREA'
-      next if line =~ /^#/
-      line.strip!.upcase!
+      line.upcase!
       build_line_found = true if ( line =~ /^BUILD/ )     # (Hard-coded this keyword to be the *minimum* requirement for the #AREAS section)
       strategy_line_found = true if ( line =~ /STRATEGY/ )     # (Sessions should always have a Strategy too)
       
@@ -354,6 +366,14 @@ def parse_charter( session_type = 'test' )
       else
         error("Unexpected #AREAS label \"#{line}\" in CHARTER section. Ensure that label exists in COVERAGE.INI.")
       end
+    
+    when 'BUILD'
+      build_line_found = true
+      build_info << line
+      # Q: Is there an *unexpected* content you might find in this section?  Should it only be one line?  Error if there are 2 lines?
+      # NOTE: currently allowing free-form text in this section. Multiple lines/ID's allowed.
+      # ASSUMPTION: Build ID = single-line identifier of the build you tested on during the test session.
+      
     end
   end
   
@@ -377,11 +397,27 @@ def parse_charter( session_type = 'test' )
     end
   end
   
+  if ( build_found and ! build_info.empty? )
+    build_info.each do |line|
+      @f_CHARTERS.puts '"' + File.basename(@file) + "\"\t\"BUILD\"\t\"#{line}\""
+      @f_BUILD.puts '"' + File.basename(@file) + "\"\t\"#{line}\""
+    end
+  end
+  
   error('Missing charter description in CHARTER section.') unless ( charter_complete )
-  error('Missing #LTTD_AREA value in CHARTER section. Ensure the #LTTD_AREA hashtag is present and has valid area values underneath.') if @include_switch['LTTD']  and ( ! lttd_found or  lttd_area.empty? )
-  error('Missing #AREAS values in CHARTER section. Ensure the #AREAS hashtag is present and has valid area values underneath.') if @include_switch['Areas'] and ! area_found
+  
+  error('Missing #LTTD_AREA value in CHARTER section. Ensure the #LTTD_AREA hashtag ' +
+    'is present and has valid area values underneath.') if @include_switch['LTTD']  and ( ! lttd_found or  lttd_area.empty? )
+  
+  error('Missing #AREAS values in CHARTER section. Ensure the #AREAS hashtag is present ' +
+    'and has valid area values underneath.') if @include_switch['Areas'] and ( ! area_found or areas.empty? )
+  
+  error('Missing #BUILD value in CHARTER section. Ensure the #BUILD hashtag is present ' +
+    'and has valid information underneath.') if @include_switch['Build'] and ( ! build_found or build_info.empty? )
+  
   unless session_type == 'todo'
-    error("Missing 'BUILD' line in the #AREAS section.  Please add it.") if @include_switch['Areas'] and ! build_line_found
+    error("Missing 'BUILD' line in the #AREAS section.  Please add it.") if @include_switch['Areas'] and ! @include_switch['Build'] and ! build_line_found
+    
     error("Missing 'STRATEGY' line in the #AREAS section.  Please add it.") if @include_switch['Areas'] and ! strategy_line_found
   end
 end
@@ -426,11 +462,15 @@ def parse_start( session_type = 'test' )
         end
       end
     elsif ( ! line.empty? )
-      error("Unexpected text found \"#{line}\" in START section. Ensure that the time stamp is in this format: mm/dd/yyyy hh:mm{am|pm}. 12-hr or 24-hr time format works.")
+      error("Unexpected text found \"#{line}\" in START section. Ensure that the time stamp " +
+        "is in this format: mm/dd/yyyy hh:mm{am|pm}. 12-hr or 24-hr time format works.")
     end
   end
+  
   error('Missing time stamp in START section') if (! time_found && session_type == 'test' )
-  error('START section must be empty if the sheet is named as a TODO. Did you forget to rename the session sheet?') if ( time_found && session_type == 'todo' )
+  
+  error('START section must be empty if the sheet is named as a TODO. Did you forget ' +
+    'to rename the session sheet?') if ( time_found && session_type == 'todo' )
   
   return time_line
 end
@@ -584,7 +624,8 @@ def parse_breakdown( num_testers )
         cvo_content_found = true
         
         if ( line !~ /^\d+\s*(\W)\s*\d+/ )
-          error("Unexpected #CHARTER VS. OPPORTUNITY value \"#{line}\" in TASK BREAKDOWN section. Ensure that the values are integers from 0-100 separated by '/'.")
+          error("Unexpected #CHARTER VS. OPPORTUNITY value \"#{line}\" in TASK BREAKDOWN section. " +
+            "Ensure that the values are integers from 0-100 separated by '/'.")
         end
         
         (cha_val, opp_val) = line.split($1)
@@ -612,9 +653,13 @@ def parse_breakdown( num_testers )
   end
   
   error('Missing #DURATION in TASK BREAKDOWN section') if @include_switch['Duration'] and ( ( ! dur_section_found ) or ( dur_section_found and ! dur_content_found) )
+  
   error('Missing #TEST DESIGN AND EXECUTION in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! tde_section_found ) or ( tde_section_found and ! tde_content_found) )
+  
   error('Missing #BUG INVESTIGATION AND REPORTING in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! bir_section_found ) or ( bir_section_found and ! bir_content_found) )
+  
   error('Missing #SESSION SETUP in TASK BREAKDOWN section') if @include_switch['TBS'] and ( ( ! set_section_found ) or ( set_section_found and ! set_content_found) )
+  
   error('Missing #CHARTER VS. OPPORTUNITY in TASK BREAKDOWN section') if @include_switch['C vs O'] and ( ( ! cvo_section_found ) or ( cvo_section_found and ! cvo_content_found) )
   
   if @include_switch['TBS'] and ( ( prep_val.to_i + test_val.to_i + bug_val.to_i ) != 100 )
@@ -689,7 +734,8 @@ def parse_data
       if ( file_exists )
         @f_DATA.puts '"' + File.basename(@file) + "\"\t\"#{line}\""
       else
-        error("Missing data file \"#{line}\" in the data file directory. Ensure the file exists in the \"#{@data_dir}\" directory specified in the SBTM.YML configuration file.")
+        error("Missing data file \"#{line}\" in the data file directory. Ensure the file exists " +
+          "in the \"#{@data_dir}\" directory specified in the SBTM.YML configuration file.")
       end
     end
   end
@@ -717,11 +763,13 @@ def parse_testnotes
     error('TEST NOTES section is empty. If you have no notes, specify #N/A.')
     
   elsif ( na and content )
-    error('Unexpected text found with #N/A tag in TEST NOTES section. If you specify #N/A, no other text is permitted in this section.')
+    error('Unexpected text found with #N/A tag in TEST NOTES section. ' +
+      'If you specify #N/A, no other text is permitted in this section.')
     
   elsif ( na and ! content )
     @f_TESTNOTES.puts '"' + File.basename(@file) + "\"\t\"<empty>\""
-    warning('There are *no* Test Notes in this sheet. Are there no thoughts, test ideas, observations or setup information worth noting?')
+    warning('There are *no* Test Notes in this sheet. Are there no thoughts, ' +
+      'test ideas, observations or setup information worth noting?')
     
   elsif ( ! na and content )
     clear_final_blanks( @testnotes_contents )
@@ -948,6 +996,11 @@ end
 @f_CHARTERS = File.new( metrics_dir + '/charters.txt', 'w' )
 @f_CHARTERS.puts "\"Session\"\t\"Field\"\t\"Value\""
 
+if @include_switch['Build']
+  @f_BUILD = File.new( metrics_dir + '/builds.txt', 'w' )
+  @f_BUILD.puts "\"Session\"\t\"Build ID\""
+end
+
 @f_TESTERS = File.new( metrics_dir + '/testers.txt', 'w' )
 @f_TESTERS.puts "\"Session\"\t\"Tester\""
 
@@ -979,7 +1032,8 @@ end
   file_name = File.basename( file_path )
   if ( file_name !~ /^et-\w{2,3}-\d{6}-\w\.ses/ )
     # if the filename isn't correct, skip the sheet and go to the next one
-    error("Unexpected session file name. If it's a session sheet, its name must be: \"ET-<tester initials>-<yymmdd>-<A, B, C, etc.>.SES\". If it's a TODO sheet, its name must be: \"ET-TODO-<priority number>-<title>.SES\"")
+    error("Unexpected session file name. If it's a session sheet, its name must be: \"ET-<tester initials>-" +
+      "<yymmdd>-<A, B, C, etc.>.SES\". If it's a TODO sheet, its name must be: \"ET-TODO-<priority number>-<title>.SES\"")
   else
     
     @file = file_path
@@ -1026,6 +1080,7 @@ end
 end
 
 @f_CHARTERS.close
+@f_BUILD.close if @include_switch['Build']
 @f_TESTERS.close
 @f_DATA.close if @include_switch['Data Files']
 @f_TESTNOTES.close
