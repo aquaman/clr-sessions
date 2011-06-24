@@ -11,12 +11,20 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 13 June 2011
+# Last Updated:: 15 June 2011
 # -----
 
-## CHANGE THESE FOLDER NAMES IF YOUR LOCATIONS ARE DIFFERENT ##
+### NOTES ###
+
+## SPECIFY THE DATE/TIME FORMAT YOU WANT TO SEE IN
+## YOUR SESSION SHEETS IN THE SBTM.YML CONFIG FILE
+
+## CHANGE THESE FOLDER NAMES IF YOUR LOCATIONS ARE DIFFERENT
 approved_folder = 'approved'
 submitted_folder = 'submitted'
+
+
+### START ###
 
 # Find the 'config' folder location; keep moving up the folder tree from the current script location:
 Dir.chdir( File.expand_path( File.dirname(__FILE__) ) )
@@ -66,8 +74,9 @@ config = YAML.load_file( 'config/sbtm.yml' )
 begin
   tester_info = config['tester_ID']
   @include_switch = config['scan_options']
+  output = config['output']
   
-  raise if tester_info.nil? or @include_switch.nil?
+ raise if tester_info.nil? or @include_switch.nil? or output.nil?
 rescue
   message << 'Error reading values from SBTM.YML!'
   message << 'Please check to make sure all required values exist.'
@@ -91,6 +100,18 @@ if ( tester_info['full name'].nil? ) or ( tester_info['initials'].nil? ) or
   setup_fail( message )
 end
 
+# Check to make sure the Date & Time formats are present:
+if ( output['date format'].nil? ) or ( output['time format'].nil? )
+  # (it would be nice to add a regex here to check for basic expected formatting)
+  
+  message << 'SBTM.YML needs to be updated!'
+  message << 'Please update the Output section with the Date and Time formats'
+  message << "'date format' = '#{ output['date format'] }'"
+  message << "'time format' = '#{ output['time format'] }'" 
+  
+  setup_fail( message )
+end
+
 
 # Create main body of the template
 mainbody = ''
@@ -104,7 +125,8 @@ mainbody << "\nSTART\n"
 mainbody << dashedline
 
 # Add time stamp here!
-mainbody << Time.now.strftime("%m/%d/%Y %H:%M\n\n")
+datetime_format = output['date format'] + ' ' + output['time format']
+mainbody << Time.now.strftime(datetime_format + "\n\n")
 
 mainbody << "TESTER\n"
 mainbody << dashedline
@@ -166,6 +188,6 @@ et_file = File.new( submitted_folder + new_et_session_name,  'w' )
 et_file.puts mainbody
 et_file.close
 
-puts '** Created new file: ' + submitted_folder + new_et_session_name
+puts "\n** Created new file: " + submitted_folder + new_et_session_name
 
 ### END ###
