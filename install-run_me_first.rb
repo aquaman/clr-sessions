@@ -39,9 +39,9 @@ end
 
 if RUBY_PLATFORM =~ /mswin|windows|cygwin|mingw32/i
 
-  # in Windows, rewrite all text files to change the line endings from LF to CR:
+  # in Windows: rewrite text files, delete unix .SH scripts
 
-  filez.delete_if {|filename| filename !~ /\.rb|\.txt|\.bat|\.ini|\.yml|\.tpl|\.htm|\.ses|\.drd/i }
+  filez.delete_if {|filename| filename !~ /\.rb|\.txt|\.bat|\.sh|\.ini|\.yml|\.tpl|\.htm|\.ses|\.drd/i }
 
   def rewrite( filename )
     timez = []
@@ -56,14 +56,20 @@ if RUBY_PLATFORM =~ /mswin|windows|cygwin|mingw32/i
     File.utime( timez.first, timez.last, filename )
   end
 
-  filez.each {|file| rewrite file }
+  filez.each do |file|
+    
+    if file.include? '.sh'
+      File.delete( file ) 
+      next
+    end
+    
+    rewrite file
 
-  # delete .SH scripts
-  filez.each {|file| File.delete( file ) if file.include? '.sh' }
+  end
 
 else
 
-  # in OS X or Unix, check the file permissions, delete Windows .BAT scripts
+  # in OS X or Unix: check the file permissions, delete Windows .BAT scripts
 
   filez.each do |file|
     
