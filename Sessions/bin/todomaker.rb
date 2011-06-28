@@ -8,14 +8,14 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 23 June 2011
+# Last Updated:: 28 June 2011
 # Version:: 2.1
 # -----
 
 if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbtm.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
   puts "\nUsage: #{File.basename($0)} config_dir input_file"
   puts "\nWhere 'config_dir' is the path to the directory containing SBTM.YML"
-  puts "and   'input_file' is the 'todo.xls' input file"
+  puts "and   'input_file' is the 'todos.txt' input file"
   exit
 end
 
@@ -86,7 +86,7 @@ input_file.gets     # (skip first/header line)
 while (line = input_file.gets)
   (title, area, priority, description) = line.split(/\t/)
   
-  todofile =  File.new( todo_dir + '\et-todo-' + priority + '-' + title + '.ses',  'w' )
+  todofile =  File.new( todo_dir + '/et-todo-' + priority + '-' + title + '.ses',  'w' )
   
   todofile.puts 'CHARTER'
   todofile.puts dashedline
