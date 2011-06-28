@@ -1,39 +1,32 @@
+#! /usr/bin/env ruby
 #
-# install_win.rb - Run Me First on Windows!!!
+# install-run_me_first.rb
 #
-# 1. check to make sure this is a Windows system. If not, stop
-# 2. collect list of files in sub-directories
-# 3. delete all instances of .gitignore
-# 4. rewrite all files that have had the line endings set to LF
-#    a) be sure to 'touch' the file and set the correct file date info.
-#    b) files to rewrite include EVERYTHING, except: .PDF, .GIF, .RTF, .XLS
-# 5. Update SBTM.YML
+# 1. delete all instances of .gitignore (needed in repository, but not in daily use)
+# 2. a) in Windows, rewrite all text files to convert line endings from LF to CR
+#       * files to skip: .PDF, .GIF, .RTF, .XLS
+#       * delete any .SH files
+#    b) in OS X, delete .BAT files and check the file permissions
+# 3. Update SBTM.YML
 #
-# Last Updated:: 24 June 2011
+# Last Updated:: 28 June 2011
 #
-
-## 1) Check to make sure this is a Windows operating system:
-
-if RUBY_PLATFORM !~ /mswin|windows|cygwin|mingw32/i
-  puts 'This script is meant for users of the MS Windows operating system only.'
-  puts 'Nothing to do.'
-  exit
-end
 
 puts
-puts 'Cleaning up the files for Windows use...'
+puts 'Cleaning up the files for first-time use...'
 puts
 
 
-## 2) Collect the file and folder names:
+# Collect the file and folder names:
 
 filez = Dir[ '**/*' ]
 
-
-## 3) delete all instances of .gitignore:
-
 folderz = ['.']
 filez.each {|filename| folderz << filename  if ( File.basename( filename ) !~ /\./ ) }
+filez.delete_if {|folder| File.basename( folder ) !~ /\./ }
+
+
+## 1) delete all instances of .gitignore:
 
 folderz.each do | folder_name |
   if Dir.entries( folder_name ).include? '.gitignore'
@@ -42,27 +35,55 @@ folderz.each do | folder_name |
 end
 
 
-## 4) rewrite all text files to change the line endings from LF to CR:
+## 2) some file maintenance depending on the Operating System:
 
-filez.delete_if {|filename| filename !~ /\.rb|\.txt|\.bat|\.ini|\.yml|\.tpl|\.htm|\.ses|\.drd/i }
+if RUBY_PLATFORM =~ /mswin|windows|cygwin|mingw32/i
 
-def rewrite( filename )
-  timez = []
-  timez << File.ctime( filename ) 
-  timez << File.mtime( filename ) 
-  
-  contentz = IO.readlines( filename )
-  f = File.new( filename, 'w' )
-  contentz.each {|line| f.puts line }
-  f.close
-  
-  File.utime( timez.first, timez.last, filename )
+  # in Windows, rewrite all text files to change the line endings from LF to CR:
+
+  filez.delete_if {|filename| filename !~ /\.rb|\.txt|\.bat|\.ini|\.yml|\.tpl|\.htm|\.ses|\.drd/i }
+
+  def rewrite( filename )
+    timez = []
+    timez << File.ctime( filename ) 
+    timez << File.mtime( filename ) 
+    
+    contentz = IO.readlines( filename )
+    f = File.new( filename, 'w' )
+    contentz.each {|line| f.puts line }
+    f.close
+    
+    File.utime( timez.first, timez.last, filename )
+  end
+
+  filez.each {|file| rewrite file }
+
+  # delete .SH scripts
+  filez.each {|file| File.delete( file ) if file.include? '.sh' }
+
+else
+
+  # in OS X or Unix, check the file permissions, delete Windows .BAT scripts
+
+  filez.each do |file|
+    
+    if file.include? '.bat'
+      File.delete( file ) 
+      next
+    end
+    
+    if file =~ /\.rb|\.sh/
+      File.chmod( 0755, file )
+    else
+      File.chmod( 0644, file )
+    end
+    
+  end
+
 end
 
-filez.each {|file| rewrite file }
 
-
-## 5) Update SBTM.YML:
+## 3) Update SBTM.YML:
 
 puts '*' * 40
 puts "\n Update the SBTM.YML configuration file\n\n"
@@ -148,4 +169,4 @@ end
 puts
 puts 'Please check the "scan_options" to make sure they match your needs.'
 
-puts "\n>> Setup complete."
+puts "\n>> Setup complete.\n\n"
