@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# scan-approved-then-run-report.bat
+# scan-approved-then-run-report.sh (variation)
 #
 
 #
-# This is a sample Windows script that you can use to automate several
+# This is a sample OS X shell script that you can use to automate several
 # actions at once.  For example, this script does the following:
 # * scan files and display results
 # * generate HTML report and display it in web browser
