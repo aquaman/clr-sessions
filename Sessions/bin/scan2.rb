@@ -18,7 +18,7 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 23 June 2011
+# Last Updated:: 30 June 2011
 # Version:: 2.1
 # -----
 @ScriptName = File.basename($0)
@@ -206,7 +206,7 @@ def parse_file
       breakdown_found = true
       reference_array = @breakdown_contents
       
-      warning("TASK BREAKDOWN section found but skipped due to SCAN switch used.") unless @include_switch['Task']
+      warning("TASK BREAKDOWN section found but skipped in SCAN based on SBTM.YML config.") unless @include_switch['Task']
       next
     elsif ( line =~ /^DATA FILES/)
       # Separate out any content found here even if @include_switch['Data Files'] = false
@@ -217,7 +217,7 @@ def parse_file
       data_found = true
       reference_array = @data_contents
       
-      warning("DATA FILES section found but skipped due to SCAN switch used.") unless @include_switch['Data Files']
+      warning("DATA FILES section found but skipped in SCAN based on SBTM.YML config.") unless @include_switch['Data Files']
       
       next
     elsif ( line =~ /^TEST NOTES/)
@@ -310,18 +310,33 @@ def parse_charter( session_type = 'test' )
   @charter_contents.each do |line|
     
     line.strip!
-    if ( line =~ /^#AREAS/ and @include_switch['Areas'] )
-      error('More than one #AREAS hashtag found in CHARTER section') if ( area_found )
-      area_found = true
-      in_section = 'AREA'
-    elsif ( line =~ /^#LTTD_AREA/ and @include_switch['LTTD'] )
-      error('More than one #LTTD_AREA hashtag found in CHARTER section') if ( lttd_found )
-      lttd_found = true
-      in_section = 'LTTD'
-    elsif ( line =~ /^#BUILD/ and @include_switch['Build'] )
-      error('More than one #BUILD hashtag found in CHARTER section') if ( build_found )
-      build_found = true
-      in_section = 'BUILD'
+    if line =~ /^#AREAS/
+      if @include_switch['Areas']
+        error('More than one #AREAS hashtag found in CHARTER section') if ( area_found )
+        area_found = true
+        in_section = 'AREA'
+      else
+        warning("#AREAS hashtag found but skipped in SCAN based on SBTM.YML config.")
+      end
+      
+    elsif line =~ /^#LTTD_AREA/
+      if @include_switch['LTTD']
+        error('More than one #LTTD_AREA hashtag found in CHARTER section') if ( lttd_found )
+        lttd_found = true
+        in_section = 'LTTD'
+      else
+        warning("#LTTD_AREA hashtag found but skipped in SCAN based on SBTM.YML config.")
+      end
+      
+    elsif line =~ /^#BUILD/
+      if @include_switch['Build']
+        error('More than one #BUILD hashtag found in CHARTER section') if ( build_found )
+        build_found = true
+        in_section = 'BUILD'
+      else
+        warning("#BUILD hashtag found but skipped in SCAN based on SBTM.YML config.")
+      end
+      
     end
     
     if ( ! charter_complete )
@@ -351,7 +366,7 @@ def parse_charter( session_type = 'test' )
     when 'LTTD'
       line.upcase!
       if @LTTD_Areas.include?( line )
-        lttd_area << line unless lttd_area.include?( line )     # (avoid duplicates)
+        lttd_area << line unless lttd_area.include?( line )     # (skip duplicates)
       else
         error("Unexpected #LTTD_AREA label \"#{line}\" in CHARTER section. Ensure that label exists in LTTD_AREAS.INI.")
       end
@@ -362,7 +377,7 @@ def parse_charter( session_type = 'test' )
       strategy_line_found = true if ( line =~ /STRATEGY/ )     # (Sessions should always have a Strategy too)
       
       if @areas_list.include?( line )
-        areas << line unless areas.include?( line )     # (avoid duplicates)
+        areas << line unless areas.include?( line )     # (skip duplicates)
       else
         error("Unexpected #AREAS label \"#{line}\" in CHARTER section. Ensure that label exists in COVERAGE.INI.")
       end
@@ -517,7 +532,7 @@ def parse_breakdown( num_testers )
         dur_section_found = true
         in_section = 'DUR'
       else
-        warning('#DURATION section found but skipped due to SCAN switch used.')
+        warning('#DURATION hashtag found but skipped in SCAN based on SBTM.YML config.')
       end
       next
     when /^#TEST DESIGN AND EXECUTION/
@@ -526,7 +541,7 @@ def parse_breakdown( num_testers )
         tde_section_found = true
         in_section = 'TDE'
       else
-        warning('#TEST DESIGN AND EXECUTION section found but skipped due to SCAN switch used.')
+        warning('#TEST DESIGN AND EXECUTION hashtag found but skipped in SCAN based on SBTM.YML config.')
       end
       next
     when /^#BUG INVESTIGATION AND REPORTING/
@@ -535,7 +550,7 @@ def parse_breakdown( num_testers )
         bir_section_found = true
         in_section = 'BIR'
       else
-        warning('#BUG INVESTIGATION AND REPORTING section found but skipped due to SCAN switch used.')
+        warning('#BUG INVESTIGATION AND REPORTING hashtag found but skipped in SCAN based on SBTM.YML config.')
       end
       next
     when /^#SESSION SETUP/
@@ -544,7 +559,7 @@ def parse_breakdown( num_testers )
         set_section_found = true
         in_section = 'SET'
       else
-        warning('#SESSION SETUP section found but skipped due to SCAN switch used.')
+        warning('#SESSION SETUP hashtag found but skipped in SCAN based on SBTM.YML config.')
       end
       next
     when /^#CHARTER VS. OPPORTUNITY/
@@ -553,7 +568,7 @@ def parse_breakdown( num_testers )
         cvo_section_found = true
         in_section = 'CVO'
       else
-        warning('#CHARTER VS. OPPORTUNITY section found but skipped due to SCAN switch used.')
+        warning('#CHARTER VS. OPPORTUNITY hashtag found but skipped in SCAN based on SBTM.YML config.')
       end
       next
     end
