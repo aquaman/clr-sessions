@@ -18,8 +18,8 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 30 June 2011
-# Version:: 2.1
+# Last Updated:: 02 July 2011
+# Version:: 2.2
 # -----
 @ScriptName = File.basename($0)
 
@@ -178,6 +178,11 @@ def parse_file
   f_SESSION = File.open( @file ) rescue die( "Can't open #{@file}", __LINE__ )
   
   while ( line = f_SESSION.gets )
+    
+    # Stop scanning if you encounter 'coffee break' line
+    # (if this appears anywhere, it should appear at the bottom, *after* all required sections are found)
+    break if line.strip =~ /^-+\s+c\[_\]\s+-+$/
+    
     # NOTE: These session sheet section headings *must* be in all CAPS.
     if ( line =~ /^CHARTER/)
       error("More than one CHARTER section found")  if ( charter_found )

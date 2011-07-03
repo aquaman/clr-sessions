@@ -1,5 +1,5 @@
 CHARTER
--------------------------------------------------
+--------------------------------------------------
 <A few sentences about the mission of this session. 
 i.e. what are you looking at, where, for what purpose.>
 
@@ -16,17 +16,17 @@ i.e. what are you looking at, where, for what purpose.>
 <single-line build identifier>
 
 START
--------------------------------------------------
+--------------------------------------------------
 <start date and time. Syntax: mm/dd/(yy or yyyy) (0:00pm or hh:mm (24-hr))
 e.g. "5/30/2010 3:20pm", "7/07/11 16:45">
 
 TESTER
--------------------------------------------------
+--------------------------------------------------
 <tester name>
 (multiple values accepted - one per line)
 
 TASK BREAKDOWN
--------------------------------------------------
+--------------------------------------------------
 #DURATION
 <values are "short", "normal", or "long" (can have multipliers)
 e.g. "long * 2", "short * 0.5">
@@ -48,12 +48,12 @@ Syntax: integer between 0-100>
 something else that was not part of the charter i.e. 85/15>
 
 DATA FILES
--------------------------------------------------
+--------------------------------------------------
 <List any files you created or used in this session. e.g. "foo (2011-05-01).xls" - omit quotes> 
 (If there are no datafiles, use #N/A)
 
 TEST NOTES
--------------------------------------------------
+--------------------------------------------------
 <free-form text field... anything goes. Take notes *while* you test! Be clear and complete!
 Some suggestions:
   a) Indicate why you are testing something, what you are looking for, what prompted you to look there
@@ -66,7 +66,7 @@ Some suggestions:
 
 
 BUGS
--------------------------------------------------
+--------------------------------------------------
 <syntax is to list every bug with a #BUG tag. The text written between these tags can be free-form. 
 (If there are no bugs, use #N/A)
 
@@ -84,5 +84,10 @@ Expected (and why):
 (i.e. if you created a bug report elsewhere, just note the ID# and description here)
 
 ISSUES
--------------------------------------------------
+--------------------------------------------------
 <same format as BUG section above.> (If there are no ISSUES, use #N/A)
+
+
+<optional line break at the end of the file>
+---------- c[_] ----------------------------------
+(If you include this line, anything after/below it will be ignored by the scan tool)
