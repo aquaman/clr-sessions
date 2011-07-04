@@ -18,8 +18,8 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 30 June 2011
-# Version:: 2.1
+# Last Updated:: 04 July 2011
+# Version:: 2.2
 # -----
 @ScriptName = File.basename($0)
 
@@ -165,45 +165,52 @@ end
 # This is the starting point for examining each session sheet. Review each sheet and break it up into the major sections. Put the contents of each section block into an array so we can work with it later.
 #
 def parse_file
-  charter_found = false ;    @charter_contents = []
-  start_found = false ;      @start_contents = []
-  tester_found = false ;     @tester_contents = []
-  breakdown_found = false ;  @breakdown_contents = []
-  data_found = false ;       @data_contents = []
-  testnotes_found = false ;  @testnotes_contents = []
-  bugs_found = false ;       @bugs_contents = []
-  issues_found = false ;     @issues_contents = []
-  tab_char_found = false
+  
+  content_found = Hash.new
+  content_found.default = false
+  @charter_contents = []
+  @start_contents = []
+  @tester_contents = []
+  @breakdown_contents = []
+  @data_contents = []
+  @testnotes_contents = []
+  @bugs_contents = []
+  @issues_contents = []
 
   f_SESSION = File.open( @file ) rescue die( "Can't open #{@file}", __LINE__ )
   
   while ( line = f_SESSION.gets )
+    
+    # Stop scanning if you encounter 'coffee break' line
+    # (if this appears anywhere, it should appear at the bottom, *after* all required sections are found)
+    break if line.strip =~ /^-+\s+c\[_\]\s+-+$/
+    
     # NOTE: These session sheet section headings *must* be in all CAPS.
     if ( line =~ /^CHARTER/)
-      error("More than one CHARTER section found")  if ( charter_found )
+      error("More than one CHARTER section found")  if ( content_found['charter'] )
       line = f_SESSION.gets     # automatically skip the next line (should be dashed line)
-      charter_found = true
+      content_found['charter'] = true
       reference_array = @charter_contents
       next
     elsif ( line =~ /^START/)
-      error("More than one START section found")  if ( start_found )
+      error("More than one START section found")  if ( content_found['start'] )
       line = f_SESSION.gets
-      start_found = true
+      content_found['start'] = true
       reference_array = @start_contents
       next
     elsif ( line =~ /^TESTER/)
-      error("More than one TESTER section found")  if ( tester_found )
+      error("More than one TESTER section found")  if ( content_found['tester'] )
       line = f_SESSION.gets
-      tester_found = true
+      content_found['tester'] = true
       reference_array = @tester_contents
       next
     elsif ( line =~ /^TASK BREAKDOWN/)
       # Separate out any content found here even if @include_switch['Task'] = false
       # this will make sure that this content doesn't mistakenly get added to the section above in the session sheet.
       
-      error("More than one TASK BREAKDOWN section found")  if ( breakdown_found )
+      error("More than one TASK BREAKDOWN section found")  if ( content_found['breakdown'] )
       line = f_SESSION.gets
-      breakdown_found = true
+      content_found['breakdown'] = true
       reference_array = @breakdown_contents
       
       warning("TASK BREAKDOWN section found but skipped in SCAN based on SBTM.YML config.") unless @include_switch['Task']
@@ -212,48 +219,52 @@ def parse_file
       # Separate out any content found here even if @include_switch['Data Files'] = false
       # this will make sure that this content doesn't mistakenly get added to the section above in the session sheet.
       
-      error("More than one DATA FILES section")  if ( data_found )
+      error("More than one DATA FILES section")  if ( content_found['data'] )
       line = f_SESSION.gets
-      data_found = true
+      content_found['data'] = true
       reference_array = @data_contents
       
       warning("DATA FILES section found but skipped in SCAN based on SBTM.YML config.") unless @include_switch['Data Files']
       
       next
     elsif ( line =~ /^TEST NOTES/)
-      error("More than one TEST NOTES section found")  if ( testnotes_found )
+      error("More than one TEST NOTES section found")  if ( content_found['notes'] )
       line = f_SESSION.gets
-      testnotes_found = true
+      content_found['notes'] = true
       reference_array = @testnotes_contents
       next
     elsif ( line =~ /^BUGS/)
-      error("More than one BUGS section found")  if ( bugs_found )
+      error("More than one BUGS section found")  if ( content_found['bugs'] )
       line = f_SESSION.gets
-      bugs_found = true
+      content_found['bugs'] = true
       reference_array = @bugs_contents
       next
     elsif ( line =~ /^ISSUES/)
-      error("More than one ISSUES section found")  if ( issues_found )
+      error("More than one ISSUES section found")  if ( content_found['issues'] )
       line = f_SESSION.gets
-      issues_found = true
+      content_found['issues'] = true
       reference_array = @issues_contents
       next
     end
     line.gsub!('"', "'") if line.include? '"'
     reference_array << line rescue true   # (Rescue in case there are blank lines at the start of the file and the reference_array variable isn't set yet)
-    tab_char_found = true if ( line =~ /\t/)
+    content_found['tab_char'] = true if ( line =~ /\t/)
   end
   
-  error("Missing a CHARTER section") unless charter_found
-  error("Missing a START section") unless start_found
-  error("Missing a TESTER section") unless tester_found
-  error("Missing a TASK BREAKDOWN section") if @include_switch['Task'] and ! breakdown_found
-  error("Missing a DATA FILES section") if @include_switch['Data Files'] and ! data_found
-  error("Missing a TEST NOTES section") unless testnotes_found
-  error("Missing a BUGS section") unless bugs_found
-  error("Missing an ISSUES section") unless issues_found
+  error("Missing a CHARTER section") unless content_found['charter']
+  error("Missing a START section") unless content_found['start']
+  error("Missing a TESTER section") unless content_found['tester']
+  error("Missing a TASK BREAKDOWN section") if @include_switch['Task'] and ! content_found['breakdown']
+  error("Missing a DATA FILES section") if @include_switch['Data Files'] and ! content_found['data']
+  error("Missing a TEST NOTES section") unless content_found['notes']
+  error("Missing a BUGS section") unless content_found['bugs']
+  error("Missing an ISSUES section") unless content_found['issues']
   warning("[Tab] character found in file.  Tabs may cause unexpected formatting in " +
-    "different editors.  Please convert Tabs to Spaces if possible.") if tab_char_found
+    "different editors.  Please convert Tabs to Spaces if possible.") if content_found['tab_char']
+  
+  # (leave only the section info in the returning array)
+  content_found.delete 'tab_char'
+  return content_found
 end
 
 ##
@@ -460,7 +471,7 @@ def parse_start( session_type = 'test' )
   @start_contents.delete_if {|x| x.strip.empty? }
   @start_contents.each do |line|
     line.strip!
-    if (line =~ /^(\d+)\/(\d+)\/(\d{2,4})\s+(.+)/)
+    if (line =~ /(\d+)\/(\d+)\/(\d{2,4})\s+(.+)/)
       # create a Time object to work with:
       # reference: $1 = month, $2 = day, $3 = year, $4 = time stamp
       # ASSUMPTION ALERT: This date conversion has a defined format of mm/dd/yy
@@ -1057,31 +1068,46 @@ end
     datetime = 0
     duration = 0
     breakdown_values = []
+    num_bugs = 0
+    num_issues = 0
     
     # Parse the file into different sections (arrays), examine each in turn for errors and collect the data :
-    parse_file
-    testers = parse_tester
+    section_found = Hash.new
+    section_found = parse_file
+    
+    # (skip to the next file in the odd case that the sheet has no content)
+    next unless section_found.has_value? true
+    
+    # Examine each section found in the session sheet:
+    parse_charter if section_found['charter']
+    
+    datetime = parse_start if section_found['start']
+    
+    testers = parse_tester if section_found['tester']
     tester_count = testers.size
     
-    parse_charter
-    
-    datetime = parse_start
-    @sessions[ file_name ] << datetime
-    
-    if @include_switch['Task']
+    if @include_switch['Task'] and section_found['breakdown']
       breakdown_values = parse_breakdown( tester_count )
     else
       breakdown_values = ( ['0'] * 6 ) + ( [0] * 6 )
     end
-    @sessions[ file_name ] << breakdown_values
     
-    parse_data if @include_switch['Data Files']
-    parse_testnotes
-    @sessions[ file_name ] << parse_bugs
-    @sessions[ file_name ] << parse_issues
-    @sessions[ file_name ] << tester_count
+    parse_data if @include_switch['Data Files'] and section_found['data']
+    parse_testnotes if section_found['notes']
     
-    @sessions[ file_name ].flatten!
+    num_bugs << parse_bugs if section_found['bugs']
+    num_issues << parse_issues if section_found['issues']
+    
+    # Collect the session metrics, but not if the Date/Time stamp is missing:
+    unless datetime == 0
+      @sessions[ file_name ] << datetime
+      @sessions[ file_name ] << breakdown_values
+      @sessions[ file_name ] << num_bugs
+      @sessions[ file_name ] << num_issues
+      @sessions[ file_name ] << tester_count
+      
+      @sessions[ file_name ].flatten!
+    end
     
     if @include_switch['Duration']
       # collect the DTCV data :
@@ -1112,9 +1138,10 @@ unless todo.empty?
 
   todo.each do |file_path|
     @file = file_path
-    parse_file
-    parse_charter( 'todo' )
-    parse_start( 'todo' )
+    section_found = Hash.new
+    section_found = parse_file
+    parse_charter( 'todo' ) if section_found['charter']
+    parse_start( 'todo' ) if section_found['start']
   end
 
   ## Read in the charters-todo.txt file so we can rewrite it into a different layout:
@@ -1346,64 +1373,66 @@ testers.sort.each do | tester_name, session_list |
   tissues = {} ;         dissues = {}
   
   session_list.each do | sess_name |
-    start         = Date.parse( @sessions[ sess_name ][0].to_s )
-    time          = @sessions[ sess_name ][0]
-    duration      = @sessions[ sess_name ][1]
-    oncharter     = @sessions[ sess_name ][2]
-    onopportunity = @sessions[ sess_name ][3]
-    test          = @sessions[ sess_name ][4]
-    bug           = @sessions[ sess_name ][5]
-    prep          = @sessions[ sess_name ][6]
-    n_total       = @sessions[ sess_name ][7]
-    n_charter     = @sessions[ sess_name ][8]
-    n_opportunity = @sessions[ sess_name ][9]
-    n_test        = @sessions[ sess_name ][10]
-    n_bug         = @sessions[ sess_name ][11]
-    n_prep        = @sessions[ sess_name ][12]
-    bugs          = @sessions[ sess_name ][13].to_f     # (to help more accurately split counts between multiple testers)
-    issues        = @sessions[ sess_name ][14].to_f
-    testers       = @sessions[ sess_name ][15]
-    
-    f_TESTERBREAKS.puts '"' + sess_name + "\"\t\"" + 
-      start.strftime("%Y-%m-%d") + "\"\t\"" + 
-      time.strftime("%I:%M %p").downcase + "\"\t\"" + 
-      duration + "\"\t\"" + 
-      oncharter + "\"\t\"" + 
-      onopportunity + "\"\t\"" + 
-      test + "\"\t\"" + 
-      bug + "\"\t\"" + 
-      prep + "\"\t\"" + 
-      ( n_total/testers ).to_s + "\"\t\"" + 
-      ( n_charter/testers ).to_s + "\"\t\"" + 
-      ( n_opportunity/testers ).to_s + "\"\t\"" + 
-      ( n_test/testers ).to_s + "\"\t\"" + 
-      ( n_bug/testers ).to_s + "\"\t\"" + 
-      ( n_prep/testers ).to_s + "\"\t\"" + 
-      ( bugs/testers ).to_s + "\"\t\"" + 
-      ( issues/testers ).to_s + "\"\t\"" + 
-      testers.to_s + "\"\t\"" + 
-      tester_name + '"'
-    
-    tn_total.has_key?( tester_name ) ?       tn_total[ tester_name ] += ( n_total/testers ) :             tn_total[ tester_name ] = ( n_total/testers )
-    tn_charter.has_key?( tester_name ) ?     tn_charter[ tester_name ] += ( n_charter/testers ) :         tn_charter[ tester_name ] = ( n_charter/testers )
-    tn_opportunity.has_key?( tester_name ) ? tn_opportunity[ tester_name ] += ( n_opportunity/testers ) : tn_opportunity[ tester_name ] = ( n_opportunity/testers )
-    tn_test.has_key?( tester_name ) ?        tn_test[ tester_name ] += ( n_test/testers ) :               tn_test[ tester_name ] = ( n_test/testers )
-    tn_bug.has_key?( tester_name ) ?         tn_bug[ tester_name ] += ( n_bug/testers ) :                 tn_bug[ tester_name ] = ( n_bug/testers )
-    tn_prep.has_key?( tester_name ) ?        tn_prep[ tester_name ] += ( n_prep/testers ) :               tn_prep[ tester_name ] = ( n_prep/testers )
-    tbugs.has_key?( tester_name ) ?          tbugs[ tester_name ] += ( bugs/testers ) :                   tbugs[ tester_name ] = ( bugs/testers )
-    tissues.has_key?( tester_name ) ?        tissues[ tester_name ] += ( issues/testers ) :               tissues[ tester_name ] = ( issues/testers )
-    
-    # these next lines are for f_TDAYBREAKS only
-    dnew_key = start.to_s + "\t" + tester_name
-    dn_total.has_key?( dnew_key ) ?        dn_total[ dnew_key ] += ( n_total/testers ) :             dn_total[ dnew_key ] = ( n_total/testers )
-    dn_charter.has_key?( dnew_key ) ?      dn_charter[ dnew_key ] += ( n_charter/testers ) :         dn_charter[ dnew_key ] = ( n_charter/testers )
-    dn_opportunity.has_key?( dnew_key ) ?  dn_opportunity[ dnew_key ] += ( n_opportunity/testers ) : dn_opportunity[ dnew_key ] = ( n_opportunity/testers )
-    dn_test.has_key?( dnew_key ) ?         dn_test[ dnew_key ] += ( n_test/testers ) :               dn_test[ dnew_key ] = ( n_test/testers )
-    dn_bug.has_key?( dnew_key ) ?          dn_bug[ dnew_key ] += ( n_bug/testers ) :                 dn_bug[ dnew_key ] = ( n_bug/testers )
-    dn_prep.has_key?( dnew_key ) ?         dn_prep[ dnew_key ] += ( n_prep/testers ) :               dn_prep[ dnew_key ] = ( n_prep/testers )
-    dbugs.has_key?( dnew_key ) ?           dbugs[ dnew_key ] += ( bugs/testers ) :                   dbugs[ dnew_key ] = ( bugs/testers )
-    dissues.has_key?( dnew_key ) ?         dissues[ dnew_key ] += ( issues/testers ) :               dissues[ dnew_key ] = ( issues/testers )
-    
+    if @sessions.has_key? sess_name
+      start         = Date.parse( @sessions[ sess_name ][0].to_s )
+      time          = @sessions[ sess_name ][0]
+      duration      = @sessions[ sess_name ][1]
+      oncharter     = @sessions[ sess_name ][2]
+      onopportunity = @sessions[ sess_name ][3]
+      test          = @sessions[ sess_name ][4]
+      bug           = @sessions[ sess_name ][5]
+      prep          = @sessions[ sess_name ][6]
+      n_total       = @sessions[ sess_name ][7]
+      n_charter     = @sessions[ sess_name ][8]
+      n_opportunity = @sessions[ sess_name ][9]
+      n_test        = @sessions[ sess_name ][10]
+      n_bug         = @sessions[ sess_name ][11]
+      n_prep        = @sessions[ sess_name ][12]
+      bugs          = @sessions[ sess_name ][13].to_f     # (to help more accurately split counts between multiple testers)
+      issues        = @sessions[ sess_name ][14].to_f
+      testers       = @sessions[ sess_name ][15]
+      
+      f_TESTERBREAKS.puts '"' + sess_name + "\"\t\"" + 
+        start.strftime("%Y-%m-%d") + "\"\t\"" + 
+        time.strftime("%I:%M %p").downcase + "\"\t\"" + 
+        duration + "\"\t\"" + 
+        oncharter + "\"\t\"" + 
+        onopportunity + "\"\t\"" + 
+        test + "\"\t\"" + 
+        bug + "\"\t\"" + 
+        prep + "\"\t\"" + 
+        ( n_total/testers ).to_s + "\"\t\"" + 
+        ( n_charter/testers ).to_s + "\"\t\"" + 
+        ( n_opportunity/testers ).to_s + "\"\t\"" + 
+        ( n_test/testers ).to_s + "\"\t\"" + 
+        ( n_bug/testers ).to_s + "\"\t\"" + 
+        ( n_prep/testers ).to_s + "\"\t\"" + 
+        ( bugs/testers ).to_s + "\"\t\"" + 
+        ( issues/testers ).to_s + "\"\t\"" + 
+        testers.to_s + "\"\t\"" + 
+        tester_name + '"'
+      
+      tn_total.has_key?( tester_name ) ?       tn_total[ tester_name ] += ( n_total/testers ) :             tn_total[ tester_name ] = ( n_total/testers )
+      tn_charter.has_key?( tester_name ) ?     tn_charter[ tester_name ] += ( n_charter/testers ) :         tn_charter[ tester_name ] = ( n_charter/testers )
+      tn_opportunity.has_key?( tester_name ) ? tn_opportunity[ tester_name ] += ( n_opportunity/testers ) : tn_opportunity[ tester_name ] = ( n_opportunity/testers )
+      tn_test.has_key?( tester_name ) ?        tn_test[ tester_name ] += ( n_test/testers ) :               tn_test[ tester_name ] = ( n_test/testers )
+      tn_bug.has_key?( tester_name ) ?         tn_bug[ tester_name ] += ( n_bug/testers ) :                 tn_bug[ tester_name ] = ( n_bug/testers )
+      tn_prep.has_key?( tester_name ) ?        tn_prep[ tester_name ] += ( n_prep/testers ) :               tn_prep[ tester_name ] = ( n_prep/testers )
+      tbugs.has_key?( tester_name ) ?          tbugs[ tester_name ] += ( bugs/testers ) :                   tbugs[ tester_name ] = ( bugs/testers )
+      tissues.has_key?( tester_name ) ?        tissues[ tester_name ] += ( issues/testers ) :               tissues[ tester_name ] = ( issues/testers )
+      
+      # these next lines are for f_TDAYBREAKS only
+      dnew_key = start.to_s + "\t" + tester_name
+      dn_total.has_key?( dnew_key ) ?        dn_total[ dnew_key ] += ( n_total/testers ) :             dn_total[ dnew_key ] = ( n_total/testers )
+      dn_charter.has_key?( dnew_key ) ?      dn_charter[ dnew_key ] += ( n_charter/testers ) :         dn_charter[ dnew_key ] = ( n_charter/testers )
+      dn_opportunity.has_key?( dnew_key ) ?  dn_opportunity[ dnew_key ] += ( n_opportunity/testers ) : dn_opportunity[ dnew_key ] = ( n_opportunity/testers )
+      dn_test.has_key?( dnew_key ) ?         dn_test[ dnew_key ] += ( n_test/testers ) :               dn_test[ dnew_key ] = ( n_test/testers )
+      dn_bug.has_key?( dnew_key ) ?          dn_bug[ dnew_key ] += ( n_bug/testers ) :                 dn_bug[ dnew_key ] = ( n_bug/testers )
+      dn_prep.has_key?( dnew_key ) ?         dn_prep[ dnew_key ] += ( n_prep/testers ) :               dn_prep[ dnew_key ] = ( n_prep/testers )
+      dbugs.has_key?( dnew_key ) ?           dbugs[ dnew_key ] += ( bugs/testers ) :                   dbugs[ dnew_key ] = ( bugs/testers )
+      dissues.has_key?( dnew_key ) ?         dissues[ dnew_key ] += ( issues/testers ) :               dissues[ dnew_key ] = ( issues/testers )
+      
+    end
   end
   
   f_TESTERTOTALS.puts '"' + tester_name + "\"\t\"" + 
@@ -1481,53 +1510,55 @@ if @include_switch['Areas']
     end
     
     session_list.each do | sess_name |
-      start         = Date.parse( @sessions[ sess_name ][0].to_s )
-      time          = @sessions[ sess_name ][0]
-      duration      = @sessions[ sess_name ][1]
-      oncharter     = @sessions[ sess_name ][2]
-      onopportunity = @sessions[ sess_name ][3]
-      test          = @sessions[ sess_name ][4]
-      bug           = @sessions[ sess_name ][5]
-      prep          = @sessions[ sess_name ][6]
-      n_total       = @sessions[ sess_name ][7]
-      n_charter     = @sessions[ sess_name ][8]
-      n_opportunity = @sessions[ sess_name ][9]
-      n_test        = @sessions[ sess_name ][10]
-      n_bug         = @sessions[ sess_name ][11]
-      n_prep        = @sessions[ sess_name ][12]
-      bugs          = @sessions[ sess_name ][13]
-      issues        = @sessions[ sess_name ][14]
-      testers       = @sessions[ sess_name ][15]
-      
-      f_COVERAGEBREAKS.puts '"' + sess_name + "\"\t\"" + 
-        start.strftime("%Y-%m-%d") + "\"\t\"" + 
-        time.strftime("%I:%M %p").downcase + "\"\t\"" + 
-        duration + "\"\t\"" + 
-        oncharter + "\"\t\"" + 
-        onopportunity + "\"\t\"" + 
-        test + "\"\t\"" + 
-        bug + "\"\t\"" + 
-        prep + "\"\t\"" + 
-        n_total.to_s + "\"\t\"" + 
-        n_charter.to_s + "\"\t\"" + 
-        n_opportunity.to_s + "\"\t\"" + 
-        n_test.to_s + "\"\t\"" + 
-        n_bug.to_s + "\"\t\"" + 
-        n_prep.to_s + "\"\t\"" + 
-        bugs.to_s + "\"\t\"" + 
-        issues.to_s + "\"\t\"" + 
-        testers.to_s + "\"\t\"" + 
-        area + '"'
-      
-      tn_total.has_key?( area ) ?        tn_total[ area ] += n_total :             tn_total[ area ] = n_total
-      tn_charter.has_key?( area ) ?      tn_charter[ area ] += n_charter :         tn_charter[ area ] = n_charter
-      tn_opportunity.has_key?( area ) ?  tn_opportunity[ area ] += n_opportunity : tn_opportunity[ area ] = n_opportunity
-      tn_test.has_key?( area ) ?         tn_test[ area ] += n_test :               tn_test[ area ] = n_test
-      tn_bug.has_key?( area ) ?          tn_bug[ area ] += n_bug :                 tn_bug[ area ] = n_bug
-      tn_prep.has_key?( area ) ?         tn_prep[ area ] += n_prep :               tn_prep[ area ] = n_prep
-      tbugs.has_key?( area ) ?           tbugs[ area ] += bugs :                   tbugs[ area ] = bugs
-      tissues.has_key?( area ) ?         tissues[ area ] += issues :               tissues[ area ] = issues
-      
+      if @sessions.has_key? sess_name
+        start         = Date.parse( @sessions[ sess_name ][0].to_s )
+        time          = @sessions[ sess_name ][0]
+        duration      = @sessions[ sess_name ][1]
+        oncharter     = @sessions[ sess_name ][2]
+        onopportunity = @sessions[ sess_name ][3]
+        test          = @sessions[ sess_name ][4]
+        bug           = @sessions[ sess_name ][5]
+        prep          = @sessions[ sess_name ][6]
+        n_total       = @sessions[ sess_name ][7]
+        n_charter     = @sessions[ sess_name ][8]
+        n_opportunity = @sessions[ sess_name ][9]
+        n_test        = @sessions[ sess_name ][10]
+        n_bug         = @sessions[ sess_name ][11]
+        n_prep        = @sessions[ sess_name ][12]
+        bugs          = @sessions[ sess_name ][13]
+        issues        = @sessions[ sess_name ][14]
+        testers       = @sessions[ sess_name ][15]
+        
+        f_COVERAGEBREAKS.puts '"' + sess_name + "\"\t\"" + 
+          start.strftime("%Y-%m-%d") + "\"\t\"" + 
+          time.strftime("%I:%M %p").downcase + "\"\t\"" + 
+          duration + "\"\t\"" + 
+          oncharter + "\"\t\"" + 
+          onopportunity + "\"\t\"" + 
+          test + "\"\t\"" + 
+          bug + "\"\t\"" + 
+          prep + "\"\t\"" + 
+          n_total.to_s + "\"\t\"" + 
+          n_charter.to_s + "\"\t\"" + 
+          n_opportunity.to_s + "\"\t\"" + 
+          n_test.to_s + "\"\t\"" + 
+          n_bug.to_s + "\"\t\"" + 
+          n_prep.to_s + "\"\t\"" + 
+          bugs.to_s + "\"\t\"" + 
+          issues.to_s + "\"\t\"" + 
+          testers.to_s + "\"\t\"" + 
+          area + '"'
+        
+        tn_total.has_key?( area ) ?        tn_total[ area ] += n_total :             tn_total[ area ] = n_total
+        tn_charter.has_key?( area ) ?      tn_charter[ area ] += n_charter :         tn_charter[ area ] = n_charter
+        tn_opportunity.has_key?( area ) ?  tn_opportunity[ area ] += n_opportunity : tn_opportunity[ area ] = n_opportunity
+        tn_test.has_key?( area ) ?         tn_test[ area ] += n_test :               tn_test[ area ] = n_test
+        tn_bug.has_key?( area ) ?          tn_bug[ area ] += n_bug :                 tn_bug[ area ] = n_bug
+        tn_prep.has_key?( area ) ?         tn_prep[ area ] += n_prep :               tn_prep[ area ] = n_prep
+        tbugs.has_key?( area ) ?           tbugs[ area ] += bugs :                   tbugs[ area ] = bugs
+        tissues.has_key?( area ) ?         tissues[ area ] += issues :               tissues[ area ] = issues
+        
+      end
     end
     
     if testarea.has_key?( area )
