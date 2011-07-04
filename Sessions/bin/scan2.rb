@@ -1095,8 +1095,8 @@ end
     parse_data if @include_switch['Data Files'] and section_found['data']
     parse_testnotes if section_found['notes']
     
-    num_bugs << parse_bugs if section_found['bugs']
-    num_issues << parse_issues if section_found['issues']
+    num_bugs = parse_bugs if section_found['bugs']
+    num_issues = parse_issues if section_found['issues']
     
     # Collect the session metrics, but not if the Date/Time stamp is missing:
     unless datetime == 0
