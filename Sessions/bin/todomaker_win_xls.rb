@@ -1,24 +1,24 @@
 #! /usr/bin/env ruby
 # -----
-# todomaker_win.rb
+# todomaker_win_xls.rb
 #
 # Purpose: Create TODO session sheets based on the content in "todo.xls"
 #
 # NOTE: This script calls MS Excel directly in MS Windows. ONLY run this script if you have both MS Windows and MS Excel installed.
 #
 # Command Line Options : 2 Required:
-# 1. folder location of the SBTM.YML configuration file (specifies the 'todo' destination folder)
+# 1. folder location of the SBT_CONFIG.YML configuration file (specifies the 'todo' destination folder)
 # 2. input file - the "todo.xls" file
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 23 June 2011
+# Last Updated:: 06 July 2011
 # Version:: 2.1
 # -----
 
-if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbtm.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
+if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbt_config.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
   puts "\nUsage: #{File.basename($0)} config_dir input_file"
-  puts "\nWhere 'config_dir' is the path to the directory containing SBTM.YML"
+  puts "\nWhere 'config_dir' is the path to the directory containing SBT_CONFIG.YML"
   puts "and   'input_file' is the 'todo.xls' input file"
   exit
 end
@@ -27,14 +27,14 @@ end
 
 # Read the Configuration file:
 require 'yaml'
-config = YAML.load_file( ARGV[0] + '/sbtm.yml' )
+config = YAML.load_file( ARGV[0] + '/sbt_config.yml' )
 
 begin
   todo_dir = config['folders']['todo_dir']
   @include_switch = config['scan_options']
 rescue
   puts '*'*50
-  puts 'Error reading value from SBTM.YML!'
+  puts 'Error reading value from SBT_CONFIG.YML!'
   puts '*'*50
   exit
 end

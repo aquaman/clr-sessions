@@ -8,21 +8,21 @@
 #--
 # TODO: remove the dependency of the HTML reports on the hard-coded path location to the Session sheets.
 # * Maybe add another command-line option to pass the folder location of the 'approved' session sheets?
-# * Maybe read the session folder location from the SBTM.YML file?
+# * Maybe read the session folder location from the SBT_CONFIG.YML file?
 #++
 #
-# Command Line Options : 1 Required - the SBTM.YML directory location
+# Command Line Options : 1 Required - the SBT_CONFIG.YML directory location
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 08 June 2011
+# Last Updated:: 06 July 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
 
-if ARGV[0].nil? or ! File.exist?( ARGV[0] + '/sbtm.yml' )
+if ARGV[0].nil? or ! File.exist?( ARGV[0] + '/sbt_config.yml' )
   puts "\nUsage: #{@ScriptName} config_dir"
-  puts "\nWhere: 'config_dir' is the path to the directory containing SBTM.YML\n"
+  puts "\nWhere: 'config_dir' is the path to the directory containing SBT_CONFIG.YML\n"
   exit
 end
 
@@ -32,7 +32,7 @@ require 'date'
 require 'time'
 
 # Read the Configuration file:
-config = YAML.load_file( ARGV[0] + '/sbtm.yml' )
+config = YAML.load_file( ARGV[0] + '/sbt_config.yml' )
 
 begin
   template_dir = config['folders']['report_templates']
@@ -45,7 +45,7 @@ begin
   raise if template_dir.nil? or metrics_dir.nil? or @report_dir.nil? or @timebox.nil? or @include_switch.nil?
 rescue
   puts '*'*50
-  puts 'Error reading value from SBTM.YML!'
+  puts 'Error reading value from SBT_CONFIG.YML!'
   puts '*'*50
   exit
 end
@@ -55,7 +55,7 @@ end
   unless FileTest.directory?( folder )
     puts '*'*50
     puts "'" + folder + "' is not a valid directory!" 
-    puts "Please check the name specified in SBTM.YML and try again."
+    puts "Please check the name specified in SBT_CONFIG.YML and try again."
     puts '*'*50
     exit
   end
@@ -136,7 +136,7 @@ def get_coverline
 end
 
 ##
-# Print a line of coverage data in HTML table format. Print the column data only if the field is included in the SBTM.YML file.
+# Print a line of coverage data in HTML table format. Print the column data only if the field is included in the SBT_CONFIG.YML file.
 #
 # This method takes 'row_num' parameter simply to alternate the table row colours - between white and yellow
 #
@@ -224,7 +224,7 @@ def get_session_line
 end
 
 ##
-# Print a line of session data in HTML table format. Print the column data only if the field is included in the SBTM.YML file.
+# Print a line of session data in HTML table format. Print the column data only if the field is included in the SBT_CONFIG.YML file.
 #
 # This method takes 'row_num' parameter simply to alternate the table row colours - between white and yellow
 #

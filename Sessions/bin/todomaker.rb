@@ -1,21 +1,23 @@
 #! /usr/bin/env ruby
 # -----
+# todomaker.rb
+#
 # Purpose: Create TODO session sheets based on the content of the "todos.txt" file
 #
 # Command Line Options : 2 Required:
-# 1. folder location of the SBTM.YML configuration file (specifies the 'todo' destination folder)
+# 1. folder location of the SBT_CONFIG.YML configuration file (specifies the 'todo' destination folder)
 # 2. input file - a [TAB]-delimited text file
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 28 June 2011
+# Last Updated:: 06 July 2011
 # Version:: 2.1
 # -----
 
-if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbtm.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
+if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbt_config.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
   puts "\nUsage: #{File.basename($0)} config_dir input_file"
-  puts "\nWhere 'config_dir' is the path to the directory containing SBTM.YML"
-  puts "and   'input_file' is the 'todos.txt' input file"
+  puts "\nWhere 'config_dir' is the path to the directory containing SBT_CONFIG.YML"
+  puts "and 'input_file' is the 'todos.txt' input file"
   exit
 end
 
@@ -28,14 +30,14 @@ end
 
 # Read the Configuration file:
 require 'yaml'
-config = YAML.load_file( ARGV[0] + '/sbtm.yml' )
+config = YAML.load_file( ARGV[0] + '/sbt_config.yml' )
 
 begin
   todo_dir = config['folders']['todo_dir']
   @include_switch = config['scan_options']
 rescue
   puts '*'*50
-  puts 'Error reading value from SBTM.YML!'
+  puts 'Error reading value from SBT_CONFIG.YML!'
   puts '*'*50
   exit
 end
@@ -81,12 +83,12 @@ mainbody << "#N/A\n\n"
 
 # Read the TODO.TXT input file
 input_file = File.open( ARGV[1] )
-input_file.gets     # (skip first/header line)
+input_file.gets # (skip first/header line)
 
 while (line = input_file.gets)
   (title, area, priority, description) = line.split(/\t/)
   
-  todofile =  File.new( todo_dir + '/et-todo-' + priority + '-' + title + '.ses',  'w' )
+  todofile = File.new( todo_dir + '/et-todo-' + priority + '-' + title + '.ses', 'w' )
   
   todofile.puts 'CHARTER'
   todofile.puts dashedline

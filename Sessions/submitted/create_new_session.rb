@@ -2,22 +2,22 @@
 # -----
 # create_new_session.rb
 #
-# Purpose: Create a new empty ET session sheet. Use the required sections in SBTM.YML and the latest found sheet to create the next one.
+# Purpose: Create a new empty ET session sheet. Use the required sections in SBT_CONFIG.YML and the latest found sheet to create the next one.
 #
 # Command Line Options : None. The script will move up through the folder tree looking for the following sub-directories:
-# 1. 'config' folder containing the SBTM.YML configuration file (to read the tester information - name & initials)
+# 1. 'config' folder containing the SBT_CONFIG.YML configuration file (to read the tester information - name & initials)
 # 2. 'approved' folder
 # 3. 'submitted' folder (default location for writing the new session sheet to)
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 23 June 2011
+# Last Updated:: 06 July 2011
 # -----
 
 ### NOTES ###
 
 ## SPECIFY THE DATE/TIME FORMAT YOU WANT TO SEE IN
-## YOUR SESSION SHEETS IN THE SBTM.YML CONFIG FILE
+## YOUR SESSION SHEETS IN THE "SBT_CONFIG.YML" CONFIG FILE
 
 ## CHANGE THESE FOLDER NAMES IF YOUR LOCATIONS ARE DIFFERENT
 approved_folder = 'approved'
@@ -48,9 +48,9 @@ unless Dir.entries('.').include? 'config'
   setup_fail( message )
 end
 
-unless File.exist?( 'config/sbtm.yml' )
-  message << "Problem Found! Unable to find the SBTM.YML configuration file!"
-  message << "Please ensure the 'config' directory contains the SBTM.YML file"
+unless File.exist?( 'config/sbt_config.yml' )
+  message << "Problem Found! Unable to find the SBT_CONFIG.YML configuration file!"
+  message << "Please ensure the 'config' directory contains the SBT_CONFIG.YML file"
   setup_fail( message )
 end
 
@@ -69,7 +69,7 @@ end
 
 # Read the Configuration file:
 require 'yaml'
-config = YAML.load_file( 'config/sbtm.yml' )
+config = YAML.load_file( 'config/sbt_config.yml' )
 
 begin
   tester_info = config['tester_ID']
@@ -78,7 +78,7 @@ begin
   
  raise if tester_info.nil? or @include_switch.nil? or output.nil?
 rescue
-  message << 'Error reading values from SBTM.YML!'
+  message << 'Error reading values from SBT_CONFIG.YML!'
   message << 'Please check to make sure all required values exist.'
   setup_fail( message )
 end
@@ -87,7 +87,7 @@ end
 if ( tester_info['full name'].nil? ) or ( tester_info['initials'].nil? ) or 
   ( tester_info['initials'].length < 2 ) or ( tester_info['initials'].length > 3 ) 
   
-  message << 'SBTM.YML needs to be updated!'
+  message << 'SBT_CONFIG.YML needs to be updated!'
   message << 'Please update the Tester ID section with your full name and initials'
   message << "'full name' = '#{ tester_info['full name'] }'"
   
@@ -104,7 +104,7 @@ end
 if ( output['date format'].nil? ) or ( output['time format'].nil? )
   # (it would be nice to add a regex here to check for basic expected formatting)
   
-  message << 'SBTM.YML needs to be updated!'
+  message << 'SBT_CONFIG.YML needs to be updated!'
   message << 'Please update the Output section with the Date and Time formats'
   message << "'date format' = '#{ output['date format'] }'"
   message << "'time format' = '#{ output['time format'] }'" 

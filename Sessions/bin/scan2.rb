@@ -7,7 +7,7 @@
 # 2. to generate data files that capture certain metrics
 #
 # Command Line Options : 2 Required:
-# 1. folder location of the SBTM.YML configuration file
+# 1. folder location of the SBT_CONFIG.YML configuration file
 # 2. folder location of the .SES files to scan
 #
 # Here are some examples:
@@ -18,16 +18,16 @@
 #
 # -----
 # Author:: Paul Carvalho
-# Last Updated:: 04 July 2011
+# Last Updated:: 06 July 2011
 # Version:: 2.2
 # -----
 @ScriptName = File.basename($0)
 
-if ( ARGV.length < 2 ) or ! File.exist?( ARGV[0] + '/sbtm.yml' ) or ! FileTest.directory?( ARGV[1] )
+if ( ARGV.length < 2 ) or ! File.exist?( ARGV[0] + '/sbt_config.yml' ) or ! FileTest.directory?( ARGV[1] )
   puts "\n!! Invalid or incorrect number of command line arguments specified."
   puts "\nUsage: #{@ScriptName} config_dir folder_to_scan"
   puts "\nWhere:"
-  puts "* config_dir     = the path to the directory containing SBTM.YML"
+  puts "* config_dir     = the path to the directory containing SBT_CONFIG.YML"
   puts "* folder_to_scan = the path to the directory containing the session sheets\n"
   exit
 end
@@ -40,7 +40,7 @@ require 'time'
 # Read the Configuration file:
 config_dir = ARGV[0]
 scan_dir = ARGV[1]
-config = YAML.load_file( config_dir + '/sbtm.yml' )
+config = YAML.load_file( config_dir + '/sbt_config.yml' )
 
 begin
   @data_dir = config['folders']['data_dir']
@@ -54,7 +54,7 @@ begin
   raise if @data_dir.nil? or metrics_dir.nil? or @timebox.nil? or @include_switch.nil?
 rescue
   puts '*'*50
-  puts 'Error reading value from SBTM.YML!'
+  puts 'Error reading value from SBT_CONFIG.YML!'
   puts '*'*50
   exit
 end
@@ -64,7 +64,7 @@ end
   unless FileTest.directory?( folder )
     puts '*'*50
     puts "'" + folder + "' is not a valid directory!" 
-    puts "Please check the name specified in SBTM.YML and try again."
+    puts "Please check the name specified in SBT_CONFIG.YML and try again."
     puts '*'*50
     exit
   end
@@ -77,7 +77,7 @@ else
   logfile = '' if logfile =~ /^\./    # Don't start a filename with a dot!
   logfile.gsub!( /[?:*"<>|]/, '')   # Remove some unwanted filename characters just in case they show up.
   if logfile.empty?
-    puts '!! Invalid filename specified for the logfile in SBTM.YML.  Outputting to console...'
+    puts '!! Invalid filename specified for the logfile in SBT_CONFIG.YML.  Outputting to console...'
     @outfile = NIL
   else
     @outfile = File.new( logfile, 'w' )
@@ -111,7 +111,7 @@ end
 ##
 # Print the error message encountered during the scan.
 #
-# The output may be to console or to log file. This is set in the SBTM.YML file.
+# The output may be to console or to log file. This is set in the SBT_CONFIG.YML file.
 #
 def error( message )
   @errors_found = true
@@ -122,7 +122,7 @@ end
 ##
 # Print any warning messages that are found. These don't trigger the "Errors Found!" message.  A Warning message alone will still produce the "Your papers are in order" message.
 #
-# Warning messages may be enabled/disabled via the SBTM.YML configuration file.
+# Warning messages may be enabled/disabled via the SBT_CONFIG.YML configuration file.
 #
 def warning( message )
   if @include_switch['Warnings']
@@ -134,7 +134,7 @@ end
 ##
 # Print the specified message either to file or to the console.
 #
-# The SBTM.YML configuration file contains an "output" setting for the "logfile":
+# The SBT_CONFIG.YML configuration file contains an "output" setting for the "logfile":
 # * if the setting value is blank, all output messages will go to the console
 # * otherwise, output will go to the filename specified
 #
@@ -213,7 +213,7 @@ def parse_file
       content_found['breakdown'] = true
       reference_array = @breakdown_contents
       
-      warning("TASK BREAKDOWN section found but skipped in SCAN based on SBTM.YML config.") unless @include_switch['Task']
+      warning("TASK BREAKDOWN section found but skipped in SCAN based on SBT_CONFIG.YML config.") unless @include_switch['Task']
       next
     elsif ( line =~ /^DATA FILES/)
       # Separate out any content found here even if @include_switch['Data Files'] = false
@@ -224,7 +224,7 @@ def parse_file
       content_found['data'] = true
       reference_array = @data_contents
       
-      warning("DATA FILES section found but skipped in SCAN based on SBTM.YML config.") unless @include_switch['Data Files']
+      warning("DATA FILES section found but skipped in SCAN based on SBT_CONFIG.YML config.") unless @include_switch['Data Files']
       
       next
     elsif ( line =~ /^TEST NOTES/)
@@ -300,7 +300,7 @@ end
 # * ##LTTD_AREA
 # * ##AREAS
 # * ##BUILD
-# The sub-sections may be enabled in the SBTML.YML configuration file.
+# The sub-sections may be enabled in the SBT_CONFIGL.YML configuration file.
 #
 # Output:
 # * Charter text is immediately saved to file
@@ -327,7 +327,7 @@ def parse_charter( session_type = 'test' )
         area_found = true
         in_section = 'AREA'
       else
-        warning("#AREAS hashtag found but skipped in SCAN based on SBTM.YML config.")
+        warning("#AREAS hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.")
       end
       
     elsif line =~ /^#LTTD_AREA/
@@ -336,7 +336,7 @@ def parse_charter( session_type = 'test' )
         lttd_found = true
         in_section = 'LTTD'
       else
-        warning("#LTTD_AREA hashtag found but skipped in SCAN based on SBTM.YML config.")
+        warning("#LTTD_AREA hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.")
       end
       
     elsif line =~ /^#BUILD/
@@ -345,7 +345,7 @@ def parse_charter( session_type = 'test' )
         build_found = true
         in_section = 'BUILD'
       else
-        warning("#BUILD hashtag found but skipped in SCAN based on SBTM.YML config.")
+        warning("#BUILD hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.")
       end
       
     end
@@ -510,7 +510,7 @@ end
 # * ##BUG INVESTIGATION AND REPORTING
 # * ##SESSION SETUP
 # * ##CHARTER VS. OPPORTUNITY
-# The sub-sections may be enabled in the SBTML.YML configuration file. The (1) Test Design, (2) Bug Investigation, and (3) Session Setup sections are configured as a *set* via the 'TBS' setting.
+# The sub-sections may be enabled in the SBT_CONFIGL.YML configuration file. The (1) Test Design, (2) Bug Investigation, and (3) Session Setup sections are configured as a *set* via the 'TBS' setting.
 #
 # Output:
 # * raw values for: duration, charter, opportunity, test, bug investigation and setup percentages
@@ -543,7 +543,7 @@ def parse_breakdown( num_testers )
         dur_section_found = true
         in_section = 'DUR'
       else
-        warning('#DURATION hashtag found but skipped in SCAN based on SBTM.YML config.')
+        warning('#DURATION hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.')
       end
       next
     when /^#TEST DESIGN AND EXECUTION/
@@ -552,7 +552,7 @@ def parse_breakdown( num_testers )
         tde_section_found = true
         in_section = 'TDE'
       else
-        warning('#TEST DESIGN AND EXECUTION hashtag found but skipped in SCAN based on SBTM.YML config.')
+        warning('#TEST DESIGN AND EXECUTION hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.')
       end
       next
     when /^#BUG INVESTIGATION AND REPORTING/
@@ -561,7 +561,7 @@ def parse_breakdown( num_testers )
         bir_section_found = true
         in_section = 'BIR'
       else
-        warning('#BUG INVESTIGATION AND REPORTING hashtag found but skipped in SCAN based on SBTM.YML config.')
+        warning('#BUG INVESTIGATION AND REPORTING hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.')
       end
       next
     when /^#SESSION SETUP/
@@ -570,7 +570,7 @@ def parse_breakdown( num_testers )
         set_section_found = true
         in_section = 'SET'
       else
-        warning('#SESSION SETUP hashtag found but skipped in SCAN based on SBTM.YML config.')
+        warning('#SESSION SETUP hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.')
       end
       next
     when /^#CHARTER VS. OPPORTUNITY/
@@ -579,7 +579,7 @@ def parse_breakdown( num_testers )
         cvo_section_found = true
         in_section = 'CVO'
       else
-        warning('#CHARTER VS. OPPORTUNITY hashtag found but skipped in SCAN based on SBTM.YML config.')
+        warning('#CHARTER VS. OPPORTUNITY hashtag found but skipped in SCAN based on SBT_CONFIG.YML config.')
       end
       next
     end
@@ -725,10 +725,10 @@ end
 ##
 # Examine the contents of the DATA FILES section of the session sheet.
 #
-# This section may be included or excluded via the SBTML.YML configuration file.
+# This section may be included or excluded via the SBT_CONFIGL.YML configuration file.
 #
 # Output:
-# * the Data File names are immediately saved to file if they are found to exist in the "data_dir" location specified in the SBTML.YML configuration file
+# * the Data File names are immediately saved to file if they are found to exist in the "data_dir" location specified in the SBT_CONFIGL.YML configuration file
 #
 def parse_data
   na = false
@@ -761,7 +761,7 @@ def parse_data
         @f_DATA.puts '"' + File.basename(@file) + "\"\t\"#{line}\""
       else
         error("Missing data file \"#{line}\" in the data file directory. Ensure the file exists " +
-          "in the \"#{@data_dir}\" directory specified in the SBTM.YML configuration file.")
+          "in the \"#{@data_dir}\" directory specified in the SBT_CONFIG.YML configuration file.")
       end
     end
   end
@@ -1238,7 +1238,7 @@ if @include_switch['Duration']
   dtcv_data.each_key do |tester|
     # For each tester in the data set, check to make sure that consecutive test sessions 
     # do NOT overlap by a significant amount of time. 
-    # This value is specified in the SBTM.YML config file: @timebox['allowable_session_overlap']
+    # This value is specified in the SBT_CONFIG.YML config file: @timebox['allowable_session_overlap']
     
     tester_data = []
     tester_data = dtcv_data[ tester ].sort { |x,y| (x[0] <=> y[0]) }
