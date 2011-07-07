@@ -7,9 +7,9 @@
 #       * files to skip: .PDF, .GIF, .RTF, .XLS
 #       * delete any .SH files
 #    b) in OS X, delete .BAT files and check the file permissions
-# 3. Update SBTM.YML
+# 3. Update SBT_CONFIG.YML
 #
-# Last Updated:: 28 June 2011
+# Last Updated:: 07 July 2011
 #
 
 puts
@@ -89,20 +89,20 @@ else
 end
 
 
-## 3) Update SBTM.YML:
+## 3) Update SBT_CONFIG.YML:
 
-puts '*' * 40
-puts "\n Update the SBTM.YML configuration file\n\n"
-puts '*' * 40
+puts '*' * 50
+puts "\n   Update the SBT_CONFIG.YML configuration file\n\n"
+puts '*' * 50
 puts
 
 # Find the 'config' folder & file..
 config_file = ''
-filez.each { |file| config_file = file if ( file =~ /sbtm\.yml/ and file !~ /doc/ ) }
+filez.each { |file| config_file = file if ( file =~ /sbt_config\.yml/ and file !~ /doc/ ) }
 
 if config_file.empty? or ! File.exist?( config_file )
 
-  puts 'Could not find the "config/sbtm.yml" file to update.'
+  puts 'Could not find the "config/sbt_config.yml" file to update.'
   puts 'Please be sure to update this file before you begin.'
 
 else
@@ -148,7 +148,7 @@ else
     puts
   end
 
-  # write info to SBTM.YML
+  # write info to SBT_CONFIG.YML
   puts 'Adding your information to the configuration file ...'
 
   config_info = IO.readlines( config_file )
