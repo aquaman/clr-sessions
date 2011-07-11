@@ -11,8 +11,12 @@
 # 2. input file - the "todo.xls" file
 #
 # -----
-# Author:: Paul Carvalho
-# Last Updated:: 06 July 2011
+# Copyright 2011 Paul Carvalho
+#
+# This program is free software and is distributed under the same terms as the Ruby GPL.
+# See LICENSE.txt in the 'doc' folder for more information.
+#
+# Last Updated:: 11 July 2011
 # Version:: 2.1
 # -----
 

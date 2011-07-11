@@ -14,8 +14,12 @@
 # Command Line Options : 1 Required - the SBT_CONFIG.YML directory location
 #
 # -----
-# Author:: Paul Carvalho
-# Last Updated:: 06 July 2011
+# Copyright (C) 2011 Paul Carvalho
+#
+# This program is free software and is distributed under the same terms as the Ruby GPL.
+# See LICENSE.txt in the 'doc' folder for more information.
+#
+# Last Updated:: 11 July 2011
 # Version:: 2.0
 # -----
 @ScriptName = File.basename($0)
