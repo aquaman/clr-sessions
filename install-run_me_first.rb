@@ -15,17 +15,42 @@
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 11 July 2011
+# Last Updated:: 17 July 2011
 # -----
 
 puts
 puts 'Cleaning up the files for first-time use...'
 puts
 
+# First find out where this script is. Assuming 3 possible locations:
+# (a) in 'Sessions' folder; (b) above 'Sessions' folder; (c) who knows where
+search_criteria = '**/*'
+
+if Dir.pwd[/\/\w+$/].downcase == '/sessions'
+  # IN the Sessions directory, so the default search_criteria is fine
+  
+elsif FileTest.directory?( 'Sessions' )
+  # Sessions subdirectory found - narrow the search_criteria to only that folder
+  search_criteria = 'Sessions/**/*'
+  
+else
+  puts '*' * 70
+  puts
+  puts 'ERROR - Unable to find the "Sessions" folder.'.center(70)
+  puts
+  puts 'Please put this script either *in* the Sessions folder,'.center(70)
+  puts 'or put it in the folder directly above it, and run it from there.'.center(70)
+  puts
+  puts '*' * 70
+  puts "\nStopping the set-up early. No changes made."
+  exit
+  
+end
+
 
 # Collect the file and folder names:
 
-filez = Dir[ '**/*' ]
+filez = Dir[ search_criteria ]
 
 folderz = ['.']
 filez.each {|filename| folderz << filename  if ( File.basename( filename ) !~ /\./ ) }
@@ -98,7 +123,9 @@ end
 ## 3) Update SBT_CONFIG.YML:
 
 puts '*' * 50
-puts "\n   Update the SBT_CONFIG.YML configuration file\n\n"
+puts
+puts 'Update the SBT_CONFIG.YML configuration file'.center(50)
+puts
 puts '*' * 50
 puts
 
