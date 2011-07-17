@@ -1,0 +1,262 @@
+How to install CLR-SESSIONS: a Command-Line Ruby Session-Based Testing Framework
+--------------------------------------------------------------------------------
+
+Go to the Project home page for background information:
+https://github.com/aquaman/clr-sessions/wiki
+
+Please be sure to read the license located in the "Sessions/doc" subfolder.
+
+If you have questions, please email: info [at] STAQS [dot] com
+
+================================================================================
+
+
+To install CLR-SESSIONS, there are 3 things you need to do:
+
+1) Install Ruby
+2) Install the CLR-SESSIONS framework
+3) Configure the CLR-SESSIONS framework
+4) Supporting applications [optional]
+
+Operating Systems:
+- This framework works in MS Windows, OS X and Linux.
+- Some of the files may require additional supporting applications - e.g. to read XLS or PDF files. Please install the appropriate supporting apps for your operating system.
+- OS X: I haven't yet figured out how to execute Ruby or shell scripts from the Mac Finder or desktop. If someone knows how to do this, please let me know! Thanks.
+
+FINAL NOTE:
+This is an Installation Guide. It ends when you are ready to use the framework for daily use. How to use the framework is covered in a separate document - CLR-SESSIONS Usage Guide.
+
+
+--------------------------------------------------------------------------------
+
+
+1) Installing Ruby:
+-------------------
+If you already have Ruby installed and running on your computer, cool. Skip this section and move onto Step 2 - Install the CLR-SESSIONS framework.
+
+To install Ruby, go to the Download Ruby page and get the correct version for your operating environment:
+http://www.ruby-lang.org/en/downloads/
+
+
+TIPS:
+~~~~~
+1. The framework scripts have been tested with Ruby 1.8.6, 1.8.7 and 1.9.2.
+
+2. If prompted during the Windows Installation, be sure to (i) include RUBY in the PATH, and (ii) associate it with .RB files
+
+3. Ruby Script editor - for working with .RB files.
+* Ruby 1.8.6 in Windows includes SciTE, a simple script editor. SciTE is *not* included in the Windows installer for Ruby 1.8.7 and above.
+* Ruby scripts (or programs) are text files and technically any text editor should work. If you plan to modify the scripts, and if you don't already have a programming editor of some sort, you may wish to install a script editor to make working with these files easier.
+* See Step #4 (Supporting applications) for some suggestions if you need it.
+
+
+CHECK IT:
+~~~~~~~~~
+At a Command Prompt in Windows, or Terminal window in OS X or Linux, type in "irb" to launch the Interactive Ruby prompt.
+
+=> You should see: irb(main):001:0> _
+
+* If the irb prompt does *not* appear, stop here and figure out why not.
+* If the prompt appears, congratulations! It looks like Ruby is installed and ready to go. Type "exit" at the IRB prompt to quit.
+
+
+--------------------------------------------------------------------------------
+
+
+2) Install the CLR-SESSIONS framework:
+--------------------------------------
+You need to do three things:
+ (a) Get it - download the framework
+ (b) Install it - copy it to the desired location
+ (c) Run installer
+
+(a) Get it:
+- Go to the Project home page: https://github.com/aquaman/clr-sessions
+- Press the [Downloads] button
+- When prompted, press the [Download .zip] button
+- Save the archive file
+
+(b) Install it:
+- Open the archive file you downloaded from the project home page
+- Extract the "Sessions" folder to the desired location (**)
+  ( e.g. copy it to your C:\ drive so it is now C:\Sessions )
+- Extract the "install-run_me_first.rb" script file to the same location
+  ( e.g. copy it into your C:\ or C:\Sessions folder )
+
+(c) Run installer:
+- Open a command/terminal window
+- Navigate to where you put the "install-run_me_first.rb" script and execute it
+
+=> That's it! You are done!
+
+TIPS:
+~~~~~
+(**)Destination Location:
+- The Sessions folder _can_ be on any drive or in any folder - even a USB drive. There may be a problem where Ruby scripts can't find files if there is a *space* character anywhere in the PATH. So please keep the folder names simple and without spaces.
+- If you want to run the ruby scripts off a network drive in Windows, you may need to MAP a drive letter for them to work correctly.
+
+
+CHECK IT:
+~~~~~~~~~
+Check the setup works with the examples in the 'doc' folder:
+i) Navigate to: Sessions/doc/examples/DecideRight
+ii) run the "scan-approved-examples-then-run-report" shell script
+
+=> if the tools work correctly, you should see 2 things:
+   * a 'scan.log' file opens in a window with the message "Your papers are in order!"
+   * a web browser opens up and shows you the Summary "status.htm" file
+
+=> if you don't see these 2 things, or you receive error messages, correct the error(s) before proceeding.
+
+
+--------------------------------------------------------------------------------
+
+
+3) Configure the CLR-SESSIONS framework:
+----------------------------------------
+At the end of Step #2 (Install the CLR-SESSIONS framework), the shell scripts in the "Sessions" folder should work with the default settings.
+
+IMPORTANT:
+- The SCAN tool performs two basic functions:
+  a) scans each session sheet for errors - i.e. it performs data integrity/error checking
+  b) collects and generates metrics based on the sheets scanned
+- Understanding these two purposes will help you to understand how to customise the framework for your project needs.
+
+If you are NEW to Session-Based Testing, I recommend you work with the default Time-box lengths and Session Sheet Template sections to begin with. You will NEED to update the "coverage.ini" file at the very least.
+
+This section provides you with some highlights for how to tailor the framework to your needs.  Detailed coverage will be described in a separate CLR-SESSIONS Usage Guide - check the Project Home wiki page - see link at top of this document.
+
+There are several things you may customise, including:
+ (a) Session Time-box length
+ (b) Session Sheet Template - i.e. which sections to include
+ (c) coverage.ini - a core file useful in capturing testing details and generating metrics
+
+(a) Time-box length:
+--------------------
+As per the original SBTM article, the default time-box values are:
+* short  =  60 mins (+/- 15 mins)
+* normal =  90 mins (+/- 15 mins)
+* long   = 120 mins (+/- 15 mins)
+
+I have worked on teams and projects where finishing a 90-minute session was rarely possible. So we used 30/60/90 minute timeboxes for short/normal/long. If you use longer timeboxes, for example normal = half day (4 hours), then you may wish to change the defaul values.
+
+=> to change the defaults:
+  i) go to the 'config' folder and open the "sbt_config.yml" file
+     (This is a YAML (text) file; please open it with a good text editor.)
+ ii) At the bottom of the config file, you will find a "timebox" section
+iii) Change the number of minutes here so that: short < normal < long
+ iv) Save the file
+
+
+(b) Session Sheet Template:
+---------------------------
+WARNING: If you haven't set up a framework like this before and you are new to Session-Based Testing, you really should consider asking someone for help with this step. Otherwise, you should be able to eventually figure it out through trial and error.
+
+The CLR-SESSIONS framework REQUIRES the following sections in a session sheet at a minimum:
+* CHARTER
+* START
+* TESTER
+* TEST NOTES
+* BUGS
+* ISSUES
+
+=> Everything else is optional.
+
+- Some sub-sections enable certain metrics and data gathering. For example, if you include #AREAS, then you must update the "config/coverage.ini" file. If you include the TBS (Test/Bug/Setup) sections, then additional metrics calculations will be performed during the Scan.
+
+To update the session sheet template used, do the following:
+  i) Go to the 'doc' subfolder and open "session_sheet_template.ses" in your favourite text editor.
+ ii) Read through this file and Decide which sections you will use
+iii) Open the "config/sbt_config.yml" file
+ iv) Update the "scan_options" section as required with 'true' and 'false' values next to the sections you wish to use and hide(***)
+  v) Save the config file
+
+(***)NOTE:
+- The "scan_options" includes a "Warnings" option. This activates some extra error-checking in the Scan tool.
+- Feel free to enable this option and try it out. I often customise Warning checks for different projects, as required.
+
+CHECK IT:
+~~~~~~~~~
+You can do one of two things to check that session sheets will be created with the desired sections:
+i) Navigate to the 'submitted' folder and execute 'create_new_session.rb'
+=> a new session sheet should appear in the 'submitted' folder. Open it with your favourite editor and read through it to check that all the desired sections are present.
+
+ii) Execute the 'todo-maker' shell script in the main "Sessions" folder
+=> New session sheets should appear in the 'todo' folder. Open one with your favourite editor and read through it to check that all the desired sections are present.
+
+
+(c) coverage.ini:
+-----------------
+This file is located in the "config" subfolder. It is REQUIRED if you choose to use the #AREAS section in the Session Sheet template.
+
+There are 4 main sections in this file:
+* Environment info
+* Build info
+* Product Info
+* Test Strategy info
+
+NOTE: The Scan tool will ignore any line in this INI file that starts with #
+
+All of the data in these sections may be customised. If you are new to Session-Based Testing, start by updating the "Build" and "Product" information sections. Use the examples provided to guide you.(****)
+
+Add as many HIGH-LEVEL descriptions/lines to these sections as makes sense in your current project. I generally try to keep the number of lines to less than 15-20.
+
+NOTE: You _may_ use more lines - as many as you like. However, I have noticed two undesired effects from putting too much information here:
+ (1) the more configuration options you have here the more confusing it becomes to *manage* the testing
+ (2) there is a performance hit on scanning when there are many configuration items (i.e. 100's) and many session sheets (1000's).
+
+This framework is not meant to help you manage *every* individual Product Feature or testing detail you may be interested in. If you find you have too many product areas to work with try grouping features with something like an Affinity diagram.
+
+TIPS:
+~~~~~
+(****)Build Information:
+- If you are tracking Builds that change often, i.e. you have *many* builds on a particular testing project, you may wish to use the #BUILD section instead of #AREAS for this information
+- That is:
+  * leave the Build information out of the "config/coverage.ini" file
+  * enable the 'Build' sub-section via the "config/sbt_config.yml" file
+  * enter the build info in the #BUILD section when you are editing your session sheets
+  => the build information will automatically be recorded in the metrics reports created by the Scan tool
+
+CHECK IT:
+~~~~~~~~~
+In the 'submitted' folder, create a new session sheet.
+* Fill in the required sections with expected data
+* In the #AREAS sub-section, enter some values from the "coverage.ini" file and enter a line that is *not* in the coverage.ini file
+* Save the session sheet
+* in the main 'Sessions' folder, execute the 'scan-submitted-only' shell script
+=> the 'scan.log' file should open and show you an error message for the line you entered in the session sheet that is NOT in the coverage.ini file.
+
+
+--------------------------------------------------------------------------------
+
+
+4) Supporting applications [optional]:
+--------------------------------------
+While using this framework, I have found the following additional applications to be helpful. I don't endorse or support them and you may have other preferences. I list them here as examples of other apps that you may find helpful beyond the default operating system apps.
+
+a) Ruby script editor:
+   * Windows - I use SciTE (http://www.scintilla.org/SciTE.html)
+   * OS X - TextEdit is fine, TextMate is better (http://macromates.com/)
+
+b) Text editor:
+   * Windows - I like Notepad++ (http://notepad-plus-plus.org/) and UltraEdit
+     (you _may_ use MS Notepad or WordPad since they are already on your system)
+   * OS X - TextEdit is fine, TextMate is better (http://macromates.com/)
+
+c) File & Folder comparison:
+- This comes up all the time, especially when I am synchronizing files between different locations - e.g. local hard drive and shared network location.
+- I use these tools when I am testing too, so it is usually easy to justify the expense.
+- Some tools I have used in the past include:
+   * Windows - Beyond Compare (http://www.scootersoftware.com/), and Araxis Merge (http://www.araxis.com/)
+   * OS X - FileMerge (free, part of the Developer pack)
+
+d) Spreadsheet application:
+   * Windows - MS Excel (when I have it), LibreOffice (http://www.libreoffice.org/)
+   * OS X - iWork Numbers
+   * Linux - LibreOffice
+
+e) PDF viewer:
+   * various. use your favourite.
+
+
+=End=
