@@ -195,7 +195,7 @@ There are 4 main sections in this file:
 * Product Info
 * Test Strategy info
 
-NOTE: The Scan tool will ignore any line in this INI file that starts with #
+(NOTE: The Scan tool will ignore any line in this INI file that starts with #)
 
 All of the data in these sections may be customised. If you are new to Session-Based Testing, start by updating the "Build" and "Product" information sections. Use the examples provided to guide you.(****)
 
@@ -219,9 +219,9 @@ TIPS:
 
 CHECK IT:
 ~~~~~~~~~
-In the 'submitted' folder, create a new session sheet.
-* Fill in the required sections with expected data
-* In the #AREAS sub-section, enter some values from the "coverage.ini" file and enter a line that is *not* in the coverage.ini file
+* In the 'submitted' folder, create a new session sheet.
+  * Fill in the required sections with expected data
+  * In the #AREAS sub-section, enter some values from the "coverage.ini" file and enter a line that is _not_ in the coverage.ini file
 * Save the session sheet
 * in the main 'Sessions' folder, execute the 'scan-submitted-only' shell script
 => the 'scan.log' file should open and show you an error message for the line you entered in the session sheet that is NOT in the coverage.ini file.
@@ -239,9 +239,11 @@ a) Ruby script editor:
    * OS X - TextEdit is fine, TextMate is better (http://macromates.com/)
 
 b) Text editor:
-   * Windows - I like Notepad++ (http://notepad-plus-plus.org/) and UltraEdit
+   * Windows - I like Notepad++ (http://notepad-plus-plus.org/) and UltraEdit (both have autosave)
      (you _may_ use MS Notepad or WordPad since they are already on your system)
    * OS X - TextEdit is fine, TextMate is better (http://macromates.com/)
+
+NOTE: Be sure to associate the .SES files with your favourite text editor.
 
 c) File & Folder comparison:
 - This comes up all the time, especially when I am synchronizing files between different locations - e.g. local hard drive and shared network location.
@@ -254,9 +256,6 @@ d) Spreadsheet application:
    * Windows - MS Excel (when I have it), LibreOffice (http://www.libreoffice.org/)
    * OS X - iWork Numbers
    * Linux - LibreOffice
-
-e) PDF viewer:
-   * various. use your favourite.
 
 
 =End=
