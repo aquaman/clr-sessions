@@ -2,12 +2,18 @@
 # -----
 # create_new_session.rb
 #
-# Purpose: Create a new empty ET session sheet. Use the required sections in SBT_CONFIG.YML and the latest found sheet to create the next one.
+# Purpose: Create a new empty ET session sheet. Use the required sections in 
+# SBT_CONFIG.YML and the latest found sheet to create the next one.
 #
 # Command Line Options : None. The script will move up through the folder tree looking for the following sub-directories:
 # 1. 'config' folder containing the SBT_CONFIG.YML configuration file (to read the tester information - name & initials)
 # 2. 'approved' folder
 # 3. 'submitted' folder (default location for writing the new session sheet to)
+#
+# [NOTE:] The last step in this script is to *launch* the new file by issuing a system command.
+#         Please update this with whatever command is appropriate for your system. 
+#         (i.e. whatever you would type in at a command prompt to launch the new file 
+#          created in a text editor of your choice.)
 #
 # -----
 # Copyright (C) 2011 Paul Carvalho
@@ -15,7 +21,7 @@
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 11 July 2011
+# Last Updated:: 24 July 2011
 # -----
 
 ### NOTES ###
@@ -194,5 +200,25 @@ et_file.puts mainbody
 et_file.close
 
 puts "\n** Created new file: " + submitted_folder + new_et_session_name
+
+# Launch the new session sheet created
+launch_command = ''
+
+case RUBY_PLATFORM
+when /mswin|windows|cygwin|mingw32/i
+  # very likely Windows - (assumes the system has a file association for .SES files)
+  launch_command = 'start '
+
+when /linux/i
+  # very likely linux
+  launch_command = 'gedit '
+
+else
+  # assuming it's Max OS X
+  launch_command = 'open -e '
+
+end
+
+system( launch_command + submitted_folder + new_et_session_name )
 
 ### END ###
