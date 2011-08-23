@@ -5,6 +5,9 @@
 # Purpose: Create a new empty ET session sheet. Use the required sections in 
 # SBT_CONFIG.YML and the latest found sheet to create the next one.
 #
+# *NB:* IF there is a file in the 'config' folder called "include.footer.txt",
+# the text in that file will be automatically appended to the session sheet created here.
+#
 # Command Line Options : None. The script will move up through the folder tree looking for the following sub-directories:
 # 1. 'config' folder containing the SBT_CONFIG.YML configuration file (to read the tester information - name & initials)
 # 2. 'approved' folder
@@ -21,7 +24,7 @@
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 24 July 2011
+# Last Updated:: 23 August 2011
 # -----
 
 ### NOTES ###
@@ -171,7 +174,15 @@ mainbody << dashedline
 mainbody << "#N/A\n\n"
 mainbody << "ISSUES\n"
 mainbody << dashedline
-mainbody << "#N/A\n"
+mainbody << "#N/A\n\n"
+
+# Append extra text to the bottom of the session sheet if "include.footer.txt" exists.
+# NOTE: the first text line in the footer file needs to be the 'coffee break' line (i.e. "-- c[_] --")
+# otherwise the SCAN tool will *not* like the extra text you add!
+# (see Sessions/doc/session_sheet_template.ses for example)
+if FileTest.exist?( 'config/include.footer.txt' )
+  mainbody << IO.readlines('config/include.footer.txt').join
+end
 
 
 ### MAIN ###
