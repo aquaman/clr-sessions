@@ -1,16 +1,19 @@
-#
+###
 # Configuration file for the Command-Line Ruby Session-Based Testing framework
 #
-# Note: when editing this file, never use tabs for indenting - only use spaces
+# NOTE: when editing this file, never use tabs for indenting - only use spaces
 #
 
-# Identify yourself. This will uniquely identify your sessions.
+###
+# Tester ID: identify yourself. This will uniquely identify your sessions.
 # You may specify either 2 or 3 initials
 tester_ID:
   full name: 
   initials:  
 
-# Set an option to 'true' if you include the section in your session sheets
+###
+# Scan Options: what do you want to include in the template and scan?
+# Set an option to 'true' to include that section or option.
 scan_options:
   LTTD:       false
   Areas:      true
@@ -21,7 +24,8 @@ scan_options:
   Data Files: true
   Warnings:   false
 
-# Folders - specify relative or absolute paths
+###
+# Folders: specify relative or absolute paths
 # (Please only use /'s and DON'T put them at the end of the folder name!)
 # NOTE: If you use _relative_ paths, be sure to run the scripts from 
 #       the 'HOME' location - e.g. from within the 'Sessions' folder
@@ -32,18 +36,22 @@ folders:
   report_templates: config/templates
   todo_dir:         todo
 
-# NOTE 1: If you blank out the logfile name, the Scan Tool output
+###
+# Output: some options for the log file and session sheet date/time format
+# NOTE 1: If you *blank* out the logfile name, the Scan Tool output
 #         will be written to the console
 # NOTE 2: Specify the date and time format you prefer to see in session sheets
 #         and HTML reports. REFERENCE: Look up Ruby Time "strftime" method
 # (There are different formatting options depending on your Ruby version!)
 output:
   logfile:     scan.log
-  date format: %m/%d/%Y    # NOTE: ALL team members must use the same format!
+  date format: %m/%d/%Y    # NOTE: ALL team members must use the same date format!
   time format: %I:%M %p    # (print time in 12-hr format)
 #  time format: %H:%M       # (print time in 24-hr format)
 
-# All times are specified in minutes
+###
+# Timebox: All times are specified in minutes
+# NOTE: ALL team members must use the same timebox values
 timebox:
   short:   60
   normal:  90
