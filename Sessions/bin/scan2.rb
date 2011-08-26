@@ -22,7 +22,7 @@
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 22 August 2011
+# Last Updated:: 26 August 2011
 # Version:: 2.3
 # -----
 @ScriptName = File.basename($0)
@@ -1058,7 +1058,9 @@ end
 
 # Parse the Session sheets:
 
-@sheets.sort.each do | @file |
+@sheets.sort.each do | file_path |
+  # (FYI - in Ruby 1.9, the formal block argument cannot be an instance variable, so set it now)
+  @file = file_path
   file_name = File.basename( @file )
   
   if ( file_name !~ /^et-\w{2,3}-\d{6}-\w\.ses/ )
