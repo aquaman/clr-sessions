@@ -1,7 +1,7 @@
 CLR-SESSIONS: Command-Line Ruby Session-Based Testing Framework
 ===============================================================
 
-This is a text file-based database for creating and managing Exploratory Testing session files. To understand the context for this framework, search for information on Session-Based Test Management or SBTM. If you don't know where to start, this page has some helpful info and links: http://staqs.com
+This is a text file-based database for creating and managing Exploratory Testing session files. To understand the context for this framework, search for information on Session-Based Test Management or SBTM. If you don't know where to start, this page has some helpful info and links: http://staqs.com/docs/sbtm
 
 This framework was a port from the original Perl scripts to Ruby, and then extended with additional bug fixes and features.
 
