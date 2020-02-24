@@ -17,13 +17,13 @@
 #    c:\sessions\bin\scan.rb c:\sessions\config c:\sessions\submitted
 #
 # -----
-# Copyright (C) 2011 Paul Carvalho
+# Copyright (C) 2020 Paul Carvalho
 #
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 26 August 2011
-# Version:: 2.3
+# Last Updated:: 24 February 2020
+# Version:: 2.4
 # -----
 @ScriptName = File.basename($0)
 
@@ -223,7 +223,7 @@ def parse_file
       # Separate out any content found here even if @include_switch['Data Files'] = false
       # this will make sure that this content doesn't mistakenly get added to the section above in the session sheet.
       
-      error("More than one DATA FILES section")  if ( content_found['data'] )
+      error("More than one DATA FILES section found")  if ( content_found['data'] )
       line = f_SESSION.gets
       content_found['data'] = true
       reference_array = @data_contents
@@ -318,7 +318,6 @@ def parse_charter( session_type = 'test' )
   in_section = ''
   build_line_found = false
   strategy_line_found = false
-  os_line_found = false
   
   @charter_contents.delete_if {|x| x.strip.empty? }
 
@@ -446,9 +445,9 @@ def parse_charter( session_type = 'test' )
     'and has valid information underneath.') if @include_switch['Build'] and ( ! build_found or build_info.empty? )
   
   unless session_type == 'todo'
-    error("Missing 'BUILD' line in the #AREAS section.  Please add it.") if @include_switch['Areas'] and ! @include_switch['Build'] and ! build_line_found
+    error("Missing 'BUILD' line in the #AREAS section. Please add it.") if @include_switch['Areas'] and ! @include_switch['Build'] and ! build_line_found
     
-    error("Missing 'STRATEGY' line in the #AREAS section.  Please add it.") if @include_switch['Areas'] and ! strategy_line_found
+    error("Missing 'STRATEGY' line in the #AREAS section. Please add it.") if @include_switch['Areas'] and ! strategy_line_found
   end
 end
 
