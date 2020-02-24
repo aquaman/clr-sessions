@@ -11,15 +11,19 @@ History: I ported this framework from the original Perl scripts to Ruby in 2007.
 Please read the INSTALL.txt for instructions and examples. In a nutshell:
 
 1. Install Ruby
-2. Download a Zip copy of this project to your local hard drive
-3. Run the Ruby install script (install-run_me_first.rb) to configure it for first-time use
-4. Start creating new sessions
+1. Download a Zip copy of this project to your local hard drive
+1. Run the Ruby install script (install-run_me_first.rb) to configure it for first-time use
+1. Start creating new sessions
+1. Remember that all \*.SES files are text files. Associate the \*.SES file extension to your favourite text editor.
 
 Demo: If you want to start with a demo of the features, you can do the following:
 1. copy the example session files from 'Sessions/doc/examples/../approved' to your 'Sessions/approved' folder
-2. copy the data files from 'Sessions/doc/examples/../datafiles' to your 'Sessions/datafiles' folder
-3. run the script 'Sessions/scan-approved-then-run-report.." (.bat or .sh depending upon your OS)
-4. check out the reports generated in the 'Sessions/reports' folder
+1. copy the data files from 'Sessions/doc/examples/../datafiles' to your 'Sessions/datafiles' folder
+1. set the scan tool coverage areas:
+   1. rename the 'coverage.ini' file in 'Sessions/config' to 'coverage-sample.ini'
+   1. copy the example coverage.ini file from 'Sessions/doc/examples/../config' to your 'Sessions/config' folder
+1. run the script 'Sessions/scan-approved-then-run-report.." (_.bat or .sh_ depending upon your OS)
+1. check out the reports generated in the 'Sessions/reports' folder
 
 Please leave me feedback or add Issues to this repo to help me prioritise fixes in the coming weeks.
 
