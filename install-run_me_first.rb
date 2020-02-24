@@ -10,12 +10,12 @@
 # 3. Update SBT_CONFIG.YML
 #
 # -----
-# Copyright (C) 2011 Paul Carvalho
+# Copyright (C) 2020 Paul Carvalho
 #
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 17 July 2011
+# Last Updated:: 24 February 2020
 # -----
 
 puts
@@ -25,8 +25,9 @@ puts
 # First find out where this script is. Assuming 3 possible locations:
 # (a) in 'Sessions' folder; (b) above 'Sessions' folder; (c) who knows where
 search_criteria = '**/*'
+run_path = Dir.pwd.downcase
 
-if Dir.pwd[/\/\w+$/].downcase == '/sessions'
+if run_path.include? '/sessions'
   # IN the Sessions directory, so the default search_criteria is fine
   
 elsif FileTest.directory?( 'Sessions' )
