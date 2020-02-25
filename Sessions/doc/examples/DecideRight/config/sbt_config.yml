@@ -33,8 +33,8 @@ folders:
 # (There are different formatting options depending on your Ruby version!)
 output:
   logfile:     scan.log
-  date format: %m/%d/%Y    # NOTE: ALL team members must use the same format!
-  time format: %I:%M%p    # (print time in 12-hr format)
+  date format: '%m/%d/%Y'    # NOTE: ALL team members must use the same format!
+  time format: '%I:%M%p'    # (print time in 12-hr format)
 
 # All times are specified in minutes
 timebox:
