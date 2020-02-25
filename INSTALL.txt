@@ -6,7 +6,7 @@ https://github.com/aquaman/clr-sessions/wiki
 
 Please be sure to read the license located in the "Sessions/doc" subfolder.
 
-If you have questions, please email: info [at] STAQS [dot] com
+If you have questions, please email: tester [dot] paul [at] gmail [dot] com
 
 ================================================================================
 
@@ -40,13 +40,12 @@ http://www.ruby-lang.org/en/downloads/
 
 TIPS:
 ~~~~~
-1. The framework scripts have been tested with Ruby 1.8.6, 1.8.7 and 1.9.2.
+1. The framework scripts have been tested with Ruby 2.6.3.
 
 2. If prompted during the Windows Installation, be sure to (i) include RUBY in the PATH, and (ii) associate it with .RB files
 
-3. Ruby Script editor - for working with .RB files.
-* Ruby 1.8.6 in Windows includes SciTE, a simple script editor. SciTE is *not* included in the Windows installer for Ruby 1.8.7 and above.
-* Ruby scripts (or programs) are text files and technically any text editor should work. If you plan to modify the scripts, and if you don't already have a programming editor of some sort, you may wish to install a script editor to make working with these files easier.
+3. Ruby Programming/Script editor - for working with .RB files.
+* I recommend Atom as it is cross-platform and free, but any programming editor (IDE) will do if it supports the Ruby programming language.
 * See Step #4 (Supporting applications) for some suggestions if you need it.
 
 
@@ -235,26 +234,23 @@ CHECK IT:
 While using this framework, I have found the following additional applications to be helpful. I don't endorse or support them and you may have other preferences. I list them here as examples of other apps that you may find helpful beyond the default operating system apps.
 
 a) Ruby script editor:
-   * Windows - I use SciTE (http://www.scintilla.org/SciTE.html)
-   * OS X - TextEdit is fine, TextMate is better (http://macromates.com/)
+   * Atom, RubyMine by JetBrains
 
 b) Text editor:
-   * Windows - I like Notepad++ (http://notepad-plus-plus.org/) and UltraEdit (both have autosave)
-     (you _may_ use MS Notepad or WordPad since they are already on your system)
-   * OS X - TextEdit is fine, TextMate is better (http://macromates.com/)
+   * Windows - Notepad++, UltraEdit (choose an editor with autosave), MS Notepad (in a pinch, if you have to)
+   * OS X - TextEdit or other text editor
 
 NOTE: Be sure to associate the .SES files with your favourite text editor.
 
 c) File & Folder comparison:
-- This comes up all the time, especially when I am synchronizing files between different locations - e.g. local hard drive and shared network location.
-- I use these tools when I am testing too, so it is usually easy to justify the expense.
+- Synching files and folders across locations comes up all the time in testing and programming, so it is usually easy to justify the expense.
 - Some tools I have used in the past include:
-   * Windows - Beyond Compare (http://www.scootersoftware.com/), and Araxis Merge (http://www.araxis.com/)
+   * Windows - Beyond Compare, and Araxis Merge
    * OS X - FileMerge (free, part of the Developer pack)
 
 d) Spreadsheet application:
-   * Windows - MS Excel (when I have it), LibreOffice (http://www.libreoffice.org/)
-   * OS X - iWork Numbers
+   * Windows - MS Excel, LibreOffice
+   * OS X - Numbers
    * Linux - LibreOffice
 
 
