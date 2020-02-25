@@ -5,6 +5,10 @@
 # Purpose: to produce a list of error messages used in the given input file (e.g. SCAN.RB)
 # ----------------------------------------------------------------------------------------------------------- #
 # Ported from the original PERL script (dated 29-May-2000) to RUBY by Paul Carvalho
+#
+# This program is free software and is distributed under the same terms as the Ruby GPL.
+# See LICENSE.txt in the 'doc' folder for more information.
+#
 # Last Updated: 24 February 2020
 # =========================================================================================================== #
 
