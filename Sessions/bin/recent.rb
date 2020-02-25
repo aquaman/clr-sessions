@@ -6,6 +6,10 @@
 #    for the number of days specified (default = last 1 day)
 #
 # Ported from the original PERL script (dated 18-May-2001) to RUBY by Paul Carvalho
+#
+# This program is free software and is distributed under the same terms as the Ruby GPL.
+# See LICENSE.txt in the 'doc' folder for more information.
+#
 # Last Updated: 21 December 2007
 #------------------------------------------------------------------------------------------------------------ #
 
