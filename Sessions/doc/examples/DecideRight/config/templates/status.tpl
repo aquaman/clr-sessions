@@ -1,9 +1,9 @@
 <html>
 
 <head>
-<meta http-equiv="Content-Language" content="en-us">
-<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<title>Testing Sessions Summary</title>
+  <meta http-equiv="Content-Language" content="en-us">
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Testing Sessions Summary</title>
 </head>
 
 <body>
@@ -16,8 +16,9 @@ Sessions: 00 (00 session reports)
     Bugs: 00
 </pre>
 
-<h3><a href="s_by_datetime.htm">View Completed Session Reports</a></h3>
-<h3><a href="c_by_total.htm">View Test Coverage</a></h3>
+<h3><a href="sess_by_datetime.htm">View Completed Session Reports</a></h3>
+
+<h3><a href="cov_by_total.htm">View Test Coverage</a></h3>
 
 <p>
 
