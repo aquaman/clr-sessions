@@ -11,19 +11,20 @@
 # 2. input file - the "todo.xls" file
 #
 # -----
-# Copyright 2011 Paul Carvalho
+# Copyright 2020 Paul Carvalho
 #
 # This program is free software and is distributed under the same terms as the Ruby GPL.
 # See LICENSE.txt in the 'doc' folder for more information.
 #
-# Last Updated:: 11 July 2011
-# Version:: 2.1
+# Last Updated:: 06 March 2020
+# Version:: 2.2
 # -----
 
 if ( ARGV[0].nil? ) or ( ! File.exist?( ARGV[0] + '/sbt_config.yml' ) ) or ( ! File.exist?( ARGV[1] ) )
   puts "\nUsage: #{File.basename($0)} config_dir input_file"
   puts "\nWhere 'config_dir' is the path to the directory containing SBT_CONFIG.YML"
-  puts "and   'input_file' is the 'todo.xls' input file"
+  puts "and   'input_file' is the 'todo.xls' input file\n"
+  puts "*** NOTE: You need MS Excel and MS Windows to run this program. ***\n"
   exit
 end
 
@@ -43,12 +44,13 @@ rescue
   exit
 end
 
-# Check to make sure the Windows OLE gem is present. 
+# Check to make sure the Windows OLE gem is present.
 begin
   require 'win32ole'
 rescue LoadError
   puts '*'*70
-  puts 'Missing "win32ole" gem. Please install it and re-run this script!'
+  puts 'Missing "win32ole" gem. This program only runs in MS Windows.'
+  puts 'If you are using MS Windows, please install this gem and try again.'
   puts 'Otherwise, run the "todomaker.rb" script that uses the TODO.TXT file.'
   puts '*'*70
   exit
@@ -97,37 +99,37 @@ mainbody << "#N/A\n\n"
 # Read in the Excel file and Create new 'Todo' Session sheets
 input_file = File.expand_path( ARGV[1] )
 
-excel = WIN32OLE::new('excel.Application')
-excel['Visible'] = false
+excel = WIN32OLE::new('Excel.Application')
+excel.visible = false
 workbook = excel.Workbooks.Open( input_file )     # (must specify the FULL path name here)
 worksheet = workbook.Worksheets(1)
 
 line = '2'     # (Skip the Header Row)
-while worksheet.Range("a#{line}")['Value']
+while worksheet.Range("a#{line}").value
   data = []
   # (Only interested in the first four columns: [0] Session title, [1] Areas, [2] Priority, [3] Charter)
-  data << worksheet.Range("a#{line}:d#{line}")['Value'].flatten     # (2D array)
+  data << worksheet.Range("a#{line}:d#{line}").value.flatten     # (2D array)
   data.flatten!     # (make it a 1D array)
-  
+
   todofile =  File.new( todo_dir + '\et-todo-' + data[2].to_i.to_s + '-' + data[0].to_s + '.ses',  'w' )
-  
+
   todofile.puts 'CHARTER'
   todofile.puts dashedline
   todofile.puts data[3]
-  
+
   todofile.puts "\n#LTTD_AREA\n\n" if @include_switch['LTTD']
-  
+
   if @include_switch['Areas']
     todofile.puts "\n#AREAS"
     todofile.puts data[1].gsub(';', "\n")
   end
-  
+
   todofile.puts mainbody
-  
+
   todofile.close
   line.succ!
 end
 
-excel.quit()
+excel.Quit()
 
 ### END ###
